@@ -12,7 +12,7 @@ def unif_distr_exp_decaying_tails_pdf(y, mu, delta, sigma_1, sigma_2):
     else:
         return np.exp(-(y - (mu + delta)) ** 2 / (2 * sigma_2 ** 2)) / C
 
-def trial_proposal(y, x, j, M, delta=2., delta_1=2., sigma=.05, sigma_0=3., sigma_1=3.):
+def trial_proposal(x, y, j, M, delta=2., delta_1=2., sigma=.05, sigma_0=3., sigma_1=3.):
     # k not specified
     if j == 0:
         return unif_distr_exp_decaying_tails_pdf(y, x, delta_1, sigma, sigma)
@@ -46,5 +46,33 @@ def rejection_sampling_trial(x, j, M):
             else:
                 Y = np.random.uniform(x + (2 * j - 1) * 2 - 1, x + (2 * j - 1) * 2 + 12)
         U = np.random.uniform()
-        if U < trial_proposal(Y, x, j, M) / (c * g):
+        if U < trial_proposal(x, Y, j, M) / (c * g):
             return Y
+
+def trial_weight(z, x, k, j, M):
+    x_replacement = x.copy()
+    x_replacement[k] = z
+    # define target distr pi here:
+    # pi_1: mixture of gaussians
+    mu_1 = np.array([5, 5, 0, 0])
+    mu_2 = np.array([15, 15, 0, 0])
+    Sigma_1 = np.diag([6.25, 6.25, 6.25, 0.01])
+    Sigma_2 = np.diag([6.25, 6.25, .25, 0.01])
+    pi = multivariate_normal(mean=mu_1, cov=Sigma_1).pdf(x_replacement) / 2 + multivariate_normal(mean=mu_2, cov=Sigma_2).pdf(x_replacement) / 2
+    return pi * trial_proposal(x[k], z, j, M) * lambda_function(x[k], z, j, M)
+
+def lambda_function(x, y, j, M):
+    alpha = 2.5
+    return trial_proposal(x, y, j, M) * np.abs(x - y) ** alpha
+
+def draw_from_z_proportional_to_w(z, w):
+    if np.sum(w) != 0:
+        ps = np.array(w) / np.sum(w)
+        u = np.random.rand()
+        p_cumul = 0.0
+        for i, p in enumerate(ps):
+            p_cumul += p
+            if u <= p_cumul:
+                return z[i]
+    else:
+        return z[0]
