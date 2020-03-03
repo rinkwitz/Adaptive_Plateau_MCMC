@@ -1,5 +1,5 @@
-import numpy as np
 from Utils import *
+import matplotlib.pyplot as plt
 
 M = 5
 N = 1000

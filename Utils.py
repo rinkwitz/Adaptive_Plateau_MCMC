@@ -1,27 +1,29 @@
-import scipy as sp
-import numpy as np
-import matplotlib.pyplot as plt
-import scipy.integrate as integrate
 from scipy.stats import *
 
 
-def unif_distr_exp_decaying_tails_pdf(y, mu, delta, sigma_1, sigma_2):
+def uniform_dist_exp_decaying_tails_pdf(y, mu, delta, sigma_1, sigma_2):
     C = np.sqrt(2 * np.pi * sigma_1 ** 2) / 2 + np.sqrt(2 * np.pi * sigma_2 ** 2) / 2 + 2 * delta
     if y < mu - delta:
         return np.exp(-(y - (mu - delta)) ** 2 / (2 * sigma_1 ** 2)) / C
-    elif mu - delta <= y and y <= delta + mu:
+    elif mu - delta <= y <= delta + mu:
         return 1 / C
     else:
         return np.exp(-(y - (mu + delta)) ** 2 / (2 * sigma_2 ** 2)) / C
 
+
 def trial_proposal(x, y, j, M, delta=2., delta_1=2., sigma=.05, sigma_0=3., sigma_1=3.):
     # k not specified
     if j == 0:
-        return unif_distr_exp_decaying_tails_pdf(y, x, delta_1, sigma, sigma)
+        return uniform_dist_exp_decaying_tails_pdf(y, x, delta_1, sigma, sigma)
     elif j < M - 1:
-        return (unif_distr_exp_decaying_tails_pdf(y, x - (2 * j - 1) * delta - delta_1, delta, sigma, sigma) + unif_distr_exp_decaying_tails_pdf(y, x + (2 * j - 1) * delta + delta_1, delta, sigma, sigma)) / 2
+        return (uniform_dist_exp_decaying_tails_pdf(y, x - (2 * j - 1) * delta - delta_1, delta, sigma,
+                                                    sigma) + uniform_dist_exp_decaying_tails_pdf(y, x + (
+                2 * j - 1) * delta + delta_1, delta, sigma, sigma)) / 2
     else:
-        return (unif_distr_exp_decaying_tails_pdf(y, x - (2 * j - 1) * delta - delta_1, delta, sigma_0, sigma) + unif_distr_exp_decaying_tails_pdf(y, x + (2 * j - 1) * delta + delta_1, delta, sigma, sigma_1)) / 2
+        return (uniform_dist_exp_decaying_tails_pdf(y, x - (2 * j - 1) * delta - delta_1, delta, sigma_0,
+                                                    sigma) + uniform_dist_exp_decaying_tails_pdf(y, x + (
+                2 * j - 1) * delta + delta_1, delta, sigma, sigma_1)) / 2
+
 
 def rejection_sampling_trial(x, j, M):
     # maybe we have to make this adaptive ...
@@ -51,6 +53,7 @@ def rejection_sampling_trial(x, j, M):
         if U < trial_proposal(x, Y, j, M) / (c * g):
             return Y
 
+
 def trial_weight(z, x, k, j, M, target_dist):
     x_replacement = x.copy()
     x_replacement[k] = z
@@ -59,12 +62,14 @@ def trial_weight(z, x, k, j, M, target_dist):
         pi = norm(loc=100, scale=3).pdf(x_replacement)
 
     if target_dist == 'pi_1':
-        # mixture of gaussians (4-dim)
+        # mixture of Gaussians (4-dim)
         mu_1 = np.array([5, 5, 0, 0])
         mu_2 = np.array([15, 15, 0, 0])
         Sigma_1 = np.diag([6.25, 6.25, 6.25, 0.01])
         Sigma_2 = np.diag([6.25, 6.25, .25, 0.01])
-        pi = multivariate_normal(mean=mu_1, cov=Sigma_1).pdf(x_replacement) / 2 + multivariate_normal(mean=mu_2, cov=Sigma_2).pdf(x_replacement) / 2
+        pi = multivariate_normal(mean=mu_1, cov=Sigma_1).pdf(x_replacement) / 2 + multivariate_normal(mean=mu_2,
+                                                                                                      cov=Sigma_2).pdf(
+            x_replacement) / 2
 
     if target_dist == 'pi_2':
         # banana distribution (8-dim)
@@ -79,7 +84,9 @@ def trial_weight(z, x, k, j, M, target_dist):
         from NormalizingConst import pi_3_normalizing_const
         A = np.array([[1, 1], [1, 1.5]])
         x_replacement = x_replacement.reshape((-1, 1))
-        pi = pi_3_normalizing_const * (np.exp(-np.dot(np.dot(x_replacement.T, A), x_replacement) - np.cos(x_replacement[0, 0] / .1) - .5 * np.cos(x_replacement[1, 0] / .1)))[0, 0]
+        pi = pi_3_normalizing_const * (np.exp(
+            -np.dot(np.dot(x_replacement.T, A), x_replacement) - np.cos(x_replacement[0, 0] / .1) - .5 * np.cos(
+                x_replacement[1, 0] / .1)))[0, 0]
 
     if target_dist == 'pi_4':
         # 1D bi-stable distribution
@@ -88,18 +95,20 @@ def trial_weight(z, x, k, j, M, target_dist):
 
     return pi * trial_proposal(x[k], z, j, M) * lambda_function(x[k], z, j, M)
 
+
 def lambda_function(x, y, j, M):
     alpha = 2.5
     return trial_proposal(x, y, j, M) * np.abs(x - y) ** alpha
+
 
 def draw_from_z_proportional_to_w(z, w):
     if np.sum(w) != 0:
         ps = np.array(w) / np.sum(w)
         u = np.random.rand()
-        p_cumul = 0.0
+        p_cumulative = 0.0
         for i, p in enumerate(ps):
-            p_cumul += p
-            if u <= p_cumul:
+            p_cumulative += p
+            if u <= p_cumulative:
                 return z[i]
     else:
         return z[0]
