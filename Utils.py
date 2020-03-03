@@ -1,7 +1,9 @@
 import scipy as sp
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.integrate as integrate
 from scipy.stats import *
+
 
 def unif_distr_exp_decaying_tails_pdf(y, mu, delta, sigma_1, sigma_2):
     C = np.sqrt(2 * np.pi * sigma_1 ** 2) / 2 + np.sqrt(2 * np.pi * sigma_2 ** 2) / 2 + 2 * delta
@@ -49,16 +51,41 @@ def rejection_sampling_trial(x, j, M):
         if U < trial_proposal(x, Y, j, M) / (c * g):
             return Y
 
-def trial_weight(z, x, k, j, M):
+def trial_weight(z, x, k, j, M, target_dist):
     x_replacement = x.copy()
     x_replacement[k] = z
-    # define target distr pi here:
-    # pi_1: mixture of gaussians
-    mu_1 = np.array([5, 5, 0, 0])
-    mu_2 = np.array([15, 15, 0, 0])
-    Sigma_1 = np.diag([6.25, 6.25, 6.25, 0.01])
-    Sigma_2 = np.diag([6.25, 6.25, .25, 0.01])
-    pi = multivariate_normal(mean=mu_1, cov=Sigma_1).pdf(x_replacement) / 2 + multivariate_normal(mean=mu_2, cov=Sigma_2).pdf(x_replacement) / 2
+
+    if target_dist == 'pi_test':
+        pi = norm(loc=100, scale=3).pdf(x_replacement)
+
+    if target_dist == 'pi_1':
+        # mixture of gaussians (4-dim)
+        mu_1 = np.array([5, 5, 0, 0])
+        mu_2 = np.array([15, 15, 0, 0])
+        Sigma_1 = np.diag([6.25, 6.25, 6.25, 0.01])
+        Sigma_2 = np.diag([6.25, 6.25, .25, 0.01])
+        pi = multivariate_normal(mean=mu_1, cov=Sigma_1).pdf(x_replacement) / 2 + multivariate_normal(mean=mu_2, cov=Sigma_2).pdf(x_replacement) / 2
+
+    if target_dist == 'pi_2':
+        # banana distribution (8-dim)
+        b = .03
+        phi = x_replacement.copy()
+        phi[1] = phi[1] + b * phi[0] ** 2 - 100 * b
+        Sigma_3 = np.diag([100, 1, 1, 1, 1, 1, 1, 1])
+        pi = multivariate_normal(mean=np.zeros(8), cov=Sigma_3).pdf(phi)
+
+    if target_dist == 'pi_3':
+        # perturbed 2-dimensional Gaussian
+        from NormalizingConst import pi_3_normalizing_const
+        A = np.array([[1, 1], [1, 1.5]])
+        x_replacement = x_replacement.reshape((-1, 1))
+        pi = pi_3_normalizing_const * (np.exp(-np.dot(np.dot(x_replacement.T, A), x_replacement) - np.cos(x_replacement[0, 0] / .1) - .5 * np.cos(x_replacement[1, 0] / .1)))[0, 0]
+
+    if target_dist == 'pi_4':
+        # 1D bi-stable distribution
+        from NormalizingConst import pi_4_normalizing_const
+        pi = pi_4_normalizing_const * np.exp(-x_replacement ** 4 + 5 * x_replacement ** 2 - np.cos(x_replacement / .02))
+
     return pi * trial_proposal(x[k], z, j, M) * lambda_function(x[k], z, j, M)
 
 def lambda_function(x, y, j, M):
