@@ -1,9 +1,10 @@
-from Utils import *
+import numpy as np
 import matplotlib.pyplot as plt
+from Utils import *
 
 M = 5
 N = 1000
-target_dist = 'pi_3'
+target_dist = 'pi_4'
 dim_dict = {'pi_test': 1,
             'pi_1': 4,
             'pi_2': 8,

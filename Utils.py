@@ -1,3 +1,4 @@
+import numpy as np
 from scipy.stats import *
 
 
@@ -81,7 +82,7 @@ def trial_weight(z, x, k, j, M, target_dist):
 
     if target_dist == 'pi_3':
         # perturbed 2-dimensional Gaussian
-        from NormalizingConst import pi_3_normalizing_const
+        from NormalizingConstant_pi_3 import pi_3_normalizing_const
         A = np.array([[1, 1], [1, 1.5]])
         x_replacement = x_replacement.reshape((-1, 1))
         pi = pi_3_normalizing_const * (np.exp(
@@ -90,7 +91,7 @@ def trial_weight(z, x, k, j, M, target_dist):
 
     if target_dist == 'pi_4':
         # 1D bi-stable distribution
-        from NormalizingConst import pi_4_normalizing_const
+        from NormalizingConstant_pi_4 import pi_4_normalizing_const
         pi = pi_4_normalizing_const * np.exp(-x_replacement ** 4 + 5 * x_replacement ** 2 - np.cos(x_replacement / .02))
 
     return pi * trial_proposal(x[k], z, j, M) * lambda_function(x[k], z, j, M)
