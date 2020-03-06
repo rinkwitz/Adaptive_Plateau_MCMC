@@ -2,7 +2,7 @@ import numpy as np
 from scipy.stats import *
 
 
-def uniform_dist_exp_decaying_tails_pdf(y, mu, delta, sigma_1, sigma_2):
+def plateau_dist_exp_decaying_tails_pdf(y, mu, delta, sigma_1, sigma_2):
     C = np.sqrt(2 * np.pi * sigma_1 ** 2) / 2 + np.sqrt(2 * np.pi * sigma_2 ** 2) / 2 + 2 * delta
     if y < mu - delta:
         return np.exp(-(y - (mu - delta)) ** 2 / (2 * sigma_1 ** 2)) / C
@@ -12,50 +12,67 @@ def uniform_dist_exp_decaying_tails_pdf(y, mu, delta, sigma_1, sigma_2):
         return np.exp(-(y - (mu + delta)) ** 2 / (2 * sigma_2 ** 2)) / C
 
 
-def trial_proposal(x, y, j, M, delta=2., delta_1=2., sigma=.05, sigma_0=3., sigma_1=3.):
+def trial(x, y, j, M, delta, delta_1, sigma, sigma_0, sigma_1):
     # k not specified
     if j == 0:
-        return uniform_dist_exp_decaying_tails_pdf(y, x, delta_1, sigma, sigma)
+        return plateau_dist_exp_decaying_tails_pdf(y, x, delta_1, sigma, sigma)
     elif j < M - 1:
-        return (uniform_dist_exp_decaying_tails_pdf(y, x - (2 * j - 1) * delta - delta_1, delta, sigma,
-                                                    sigma) + uniform_dist_exp_decaying_tails_pdf(y, x + (
+        return (plateau_dist_exp_decaying_tails_pdf(y, x - (2 * j - 1) * delta - delta_1, delta, sigma,
+                                                    sigma) + plateau_dist_exp_decaying_tails_pdf(y, x + (
                 2 * j - 1) * delta + delta_1, delta, sigma, sigma)) / 2
     else:
-        return (uniform_dist_exp_decaying_tails_pdf(y, x - (2 * j - 1) * delta - delta_1, delta, sigma_0,
-                                                    sigma) + uniform_dist_exp_decaying_tails_pdf(y, x + (
+        return (plateau_dist_exp_decaying_tails_pdf(y, x - (2 * j - 1) * delta - delta_1, delta, sigma_0,
+                                                    sigma) + plateau_dist_exp_decaying_tails_pdf(y, x + (
                 2 * j - 1) * delta + delta_1, delta, sigma, sigma_1)) / 2
 
 
-def rejection_sampling_trial(x, j, M):
-    # maybe we have to make this adaptive ...
+def rejection_sampling_trial(x, j, M, delta, delta_1, sigma, sigma_0, sigma_1):
+    tail_lowest = 1e-4
     if j == 0:
-        g = 1 / 6
-        c = (1 / np.sqrt(2 * np.pi * .05 ** 2) / 2 + np.sqrt(2 * np.pi * .05 ** 2) / 2 + 2 * 2) / g
+        C = np.sqrt(2 * np.pi * sigma ** 2) / 2 + np.sqrt(2 * np.pi * sigma ** 2) / 2 + 2 * delta_1
+        tail_width = np.sqrt(np.log(C * tail_lowest) * (-2 * sigma ** 2))
+        lower_bound = x - delta_1 - tail_width
+        upper_bound = x + delta_1 + tail_width
+        g = 1 / (upper_bound - lower_bound)
+        c = (1 / np.sqrt(2 * np.pi * .05 ** 2) / 2 + np.sqrt(2 * np.pi * .05 ** 2) / 2 + 2 * delta_1) / g
     elif j < M - 1:
-        g = 1 / 6
-        c = (1 / np.sqrt(2 * np.pi * .05 ** 2) / 2 + np.sqrt(2 * np.pi * .05 ** 2) / 2 + 2 * 2) / (2 * g)
+        C = np.sqrt(2 * np.pi * sigma ** 2) / 2 + np.sqrt(2 * np.pi * sigma ** 2) / 2 + 2 * delta
+        tail_width = np.sqrt(np.log(2 * C * tail_lowest) * (-2 * sigma ** 2))
+        lower_bound_1 = x - 2 * j * delta - delta_1 - tail_width
+        upper_bound_1 = x - 2 * (j - 1) * delta - delta_1 + tail_width
+        lower_bound_2 = x + 2 * (j - 1) * delta + delta_1 - tail_width
+        upper_bound_2 = x + 2 * j * delta + delta_1 + tail_width
+        g = 1 / (upper_bound_1 - lower_bound_1)
+        c = (1 / np.sqrt(2 * np.pi * .05 ** 2) / 2 + np.sqrt(2 * np.pi * .05 ** 2) / 2 + 2 * delta) / (2 * g)
     else:
-        g = 1 / 15
-        c = (1 / np.sqrt(2 * np.pi * 3 ** 2) / 2 + np.sqrt(2 * np.pi * .05 ** 2) / 2 + 2 * 2) / (2 * g)
+        C = np.sqrt(2 * np.pi * sigma ** 2) / 2 + np.sqrt(2 * np.pi * sigma_0 ** 2) / 2 + 2 * delta
+        tail_width_1 = np.sqrt(np.log(2 * C * tail_lowest) * (-2 * sigma ** 2))
+        tail_width_2 = np.sqrt(np.log(2 * C * tail_lowest) * (-2 * sigma_0 ** 2))
+        lower_bound_1 = x - 2 * j * delta - delta_1 - tail_width_2
+        upper_bound_1 = x - 2 * (j - 1) * delta - delta_1 + tail_width_1
+        lower_bound_2 = x + 2 * (j - 1) * delta + delta_1 - tail_width_1
+        upper_bound_2 = x + 2 * j * delta + delta_1 + tail_width_2
+        g = 1 / (upper_bound_1 - lower_bound_1)
+        c = (1 / np.sqrt(2 * np.pi * 3 ** 2) / 2 + np.sqrt(2 * np.pi * .05 ** 2) / 2 + 2 * delta) / (2 * g)
     while True:
         if j == 0:
-            Y = np.random.uniform(x - 3, x + 3)
+            Y = np.random.uniform(lower_bound, upper_bound)
         elif j < M - 1:
             if np.random.rand() < .5:
-                Y = np.random.uniform(x - (2 * j - 1) * 2 - 5, x - (2 * j - 1) * 2 + 1)
+                Y = np.random.uniform(lower_bound_1, upper_bound_1)
             else:
-                Y = np.random.uniform(x + (2 * j - 1) * 2 - 1, x + (2 * j - 1) * 2 + 5)
+                Y = np.random.uniform(lower_bound_2, upper_bound_2)
         else:
             if np.random.rand() < .5:
-                Y = np.random.uniform(x - (2 * j - 1) * 2 - 12, x - (2 * j - 1) * 2 + 1)
+                Y = np.random.uniform(lower_bound_1, upper_bound_1)
             else:
-                Y = np.random.uniform(x + (2 * j - 1) * 2 - 1, x + (2 * j - 1) * 2 + 12)
+                Y = np.random.uniform(lower_bound_2, upper_bound_2)
         U = np.random.uniform()
-        if U < trial_proposal(x, Y, j, M) / (c * g):
+        if U < trial(x, Y, j, M, delta, delta_1, sigma, sigma_0, sigma_1) / (c * g):
             return Y
 
 
-def trial_weight(z, x, k, j, M, target_dist):
+def trial_weight(z, x, k, j, M, target_dist, delta, delta_1, sigma, sigma_0, sigma_1):
     x_replacement = x.copy()
     x_replacement[k] = z
 
@@ -94,12 +111,12 @@ def trial_weight(z, x, k, j, M, target_dist):
         from NormalizingConstant_pi_4 import pi_4_normalizing_const
         pi = pi_4_normalizing_const * np.exp(-x_replacement ** 4 + 5 * x_replacement ** 2 - np.cos(x_replacement / .02))
 
-    return pi * trial_proposal(x[k], z, j, M) * lambda_function(x[k], z, j, M)
+    return pi * trial(x[k], z, j, M, delta, delta_1, sigma, sigma_0, sigma_1) * lambda_function(x[k], z, j, M, delta, delta_1, sigma, sigma_0, sigma_1)
 
 
-def lambda_function(x, y, j, M):
+def lambda_function(x, y, j, M, delta, delta_1, sigma, sigma_0, sigma_1):
     alpha = 2.5
-    return trial_proposal(x, y, j, M) * np.abs(x - y) ** alpha
+    return trial(x, y, j, M, delta, delta_1, sigma, sigma_0, sigma_1) * np.abs(x - y) ** alpha
 
 
 def draw_from_z_proportional_to_w(z, w):
@@ -113,3 +130,7 @@ def draw_from_z_proportional_to_w(z, w):
                 return z[i]
     else:
         return z[0]
+
+
+def ACT_k(mc, k):
+    pass
