@@ -16,7 +16,7 @@ N_dict = {'pi_test': 1000,
             'pi_2': 10000,
             'pi_3': 3000,
             'pi_4': 3000}
-target_dist = 'pi_1'
+target_dist = 'pi_4'
 N = N_dict[target_dist]
 M = 5
 delta = [2. for i in range(dim_dict[target_dist])]

@@ -16,7 +16,7 @@ N_dict = {'pi_test': 1000,
             'pi_2': 10000,
             'pi_3': 3000,
             'pi_4': 3000}
-target_dist = 'pi_4'
+target_dist = 'pi_3'
 N = N_dict[target_dist]
 M = 5
 delta = [2. for i in range(dim_dict[target_dist])]
@@ -28,7 +28,7 @@ use_adaption = True
 eta_1 = .4
 eta_2 = .4
 L = 50
-R = 30
+R = 200
 burn_in = .5
 
 simulations = []

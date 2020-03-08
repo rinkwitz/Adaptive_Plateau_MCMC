@@ -148,6 +148,20 @@ def visualize_ACT(act, target_dist):
     plt.show()
 
 
+def visualize_log_ACT(log_act, target_dist):
+    num_components = log_act.shape[1]
+    for k in range(num_components):
+        ax = plt.subplot(1, num_components, k + 1)
+        data = log_act[:, k]
+        ax.set_xlabel('component {}'.format(k + 1))
+        ax.set_ylabel('log_ACT')
+        ax.set_xticks([])
+        ax.violinplot(data, showmeans=False, showmedians=True)
+    plt.tight_layout()
+    plt.savefig(pathlib.Path('figs')/'log_ACT_{}.png'.format(target_dist))
+    plt.show()
+
+
 def visualize_ASJD(asjd, target_dist):
     num_components = asjd.shape[1]
     for k in range(num_components):

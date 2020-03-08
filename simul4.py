@@ -28,7 +28,7 @@ use_adaption = True
 eta_1 = .4
 eta_2 = .4
 L = 50
-R = 30
+R = 200
 burn_in = .5
 
 simulations = []
@@ -50,7 +50,7 @@ for r in range(R):
 
         # algorithm 2, lines 4-3
         if (n + 1) % L == 0:
-            if use_adaption and n < burn_in * N:
+            if use_adaption:
                 # slightly different than in paper ...
                 print('frequencies of center proposals:', [c_1[k] / L for k in range(len(c_1))])
                 print('frequencies of tail proposals:', [c_M[k] / L for k in range(len(c_M))])
@@ -108,7 +108,6 @@ for r in range(R):
 
 print('')
 simulations = np.array(simulations)
-np.save(pathlib.Path('simulations')/'simulation_{}.npy'.format(target_dist), simulations)
 act = ACT(simulations)
 asjd = ASJD(simulations)
 visualize_ACT(act, target_dist)
