@@ -1,4 +1,6 @@
+import pathlib
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.stats import *
 
 
@@ -127,10 +129,34 @@ def draw_from_z_proportional_to_w(z, w):
         for i, p in enumerate(ps):
             p_cumulative += p
             if u <= p_cumulative:
-                return z[i]
+                return z[i], i
     else:
-        return z[0]
+        return z[0], 0
 
 
-def ACT_k(mc, k):
-    pass
+def visualize_ACT(act, target_dist):
+    num_components = act.shape[1]
+    for k in range(num_components):
+        ax = plt.subplot(1, num_components, k + 1)
+        data = act[:, k]
+        ax.set_xlabel('component {}'.format(k + 1))
+        ax.set_ylabel('ACT')
+        ax.set_xticks([])
+        ax.violinplot(data, showmeans=False, showmedians=True)
+    plt.tight_layout()
+    plt.savefig(pathlib.Path('figs')/'ACT_{}.png'.format(target_dist))
+    plt.show()
+
+
+def visualize_ASJD(asjd, target_dist):
+    num_components = asjd.shape[1]
+    for k in range(num_components):
+        ax = plt.subplot(1, num_components, k + 1)
+        data = asjd[:, k]
+        ax.set_xlabel('component {}'.format(k + 1))
+        ax.set_ylabel('ASJD')
+        ax.set_xticks([])
+        ax.violinplot(data, showmeans=False, showmedians=True)
+    plt.tight_layout()
+    plt.savefig(pathlib.Path('figs')/'ASDJ_{}.png'.format(target_dist))
+    plt.show()
