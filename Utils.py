@@ -134,7 +134,7 @@ def draw_from_z_proportional_to_w(z, w):
         return z[0], 0
 
 
-def visualize_ACT(act, target_dist):
+def visualize_ACT(act, target_dist, show_plot = True):
     num_components = act.shape[1]
     for k in range(num_components):
         ax = plt.subplot(1, num_components, k + 1)
@@ -145,10 +145,11 @@ def visualize_ACT(act, target_dist):
         ax.violinplot(data, showmeans=False, showmedians=True)
     plt.tight_layout()
     plt.savefig(pathlib.Path('figs')/'ACT_{}.png'.format(target_dist))
-    plt.show()
+    if show_plot:
+        plt.show()
+    plt.close()
 
-
-def visualize_log_ACT(log_act, target_dist):
+def visualize_log_ACT(log_act, target_dist, show_plot = True):
     num_components = log_act.shape[1]
     for k in range(num_components):
         ax = plt.subplot(1, num_components, k + 1)
@@ -159,10 +160,12 @@ def visualize_log_ACT(log_act, target_dist):
         ax.violinplot(data, showmeans=False, showmedians=True)
     plt.tight_layout()
     plt.savefig(pathlib.Path('figs')/'log_ACT_{}.png'.format(target_dist))
-    plt.show()
+    if show_plot:
+        plt.show()
+    plt.close()
 
 
-def visualize_ASJD(asjd, target_dist):
+def visualize_ASJD(asjd, target_dist, show_plot = True):
     num_components = asjd.shape[1]
     for k in range(num_components):
         ax = plt.subplot(1, num_components, k + 1)
@@ -173,4 +176,6 @@ def visualize_ASJD(asjd, target_dist):
         ax.violinplot(data, showmeans=False, showmedians=True)
     plt.tight_layout()
     plt.savefig(pathlib.Path('figs')/'ASDJ_{}.png'.format(target_dist))
-    plt.show()
+    if show_plot:
+        plt.show()
+    plt.close()
