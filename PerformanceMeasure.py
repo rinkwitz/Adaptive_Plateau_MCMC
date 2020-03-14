@@ -17,10 +17,10 @@ def ACT(simulations):
     for i in range(num_simulations):
         for k in range(num_components):
 
-            # # # initial positive sequence estimator:
+            # # initial positive sequence estimator:
             # N = len(simulations[i, :, k])
             # v = simulations[i, :, k].reshape(-1)
-            # act[i, k] = - lagged_autocovariance(v, 0)
+            # act[i, k] = -lagged_autocovariance(v, 0)
             # for m in range(N):
             #     if Gamma(v, m) <= 0:
             #         break

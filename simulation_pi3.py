@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from Utils import *
 from PerformanceMeasure import *
 
-
 # adjustable parameters:
 np.set_printoptions(linewidth=160)
 dim_dict = {'pi_test': 1,
@@ -29,21 +28,21 @@ use_adaption = True
 eta_1 = .4
 eta_2 = .4
 L = 50
-R = 200
-use_burn_in = False
+R = 50
+use_burn_in = True
 burn_in = .5
 show_status = True
 show_status_interval = 500
 show_adaption_info = False
 
 simulations = []
+x_initial = np.random.randn(dim_dict[target_dist])
 start = time.time()
 for r in range(R):
     # algorithm 1, line 1
-    x = np.random.randn(dim_dict[target_dist])
+    x = x_initial.copy()
     X = []
-    if burn_in == 0:
-        X.append(x.copy())
+    X.append(x.copy())
 
     # algorithm 1, line 2
     for n in range(N):
@@ -112,11 +111,8 @@ for r in range(R):
             # algorithm 1, lines 9-13
             if np.random.rand() < alpha:
                 x = y_bold.copy()
-        if use_burn_in:
-            if n >= burn_in * N:
-                X.append(x.copy())
-        else:
-            X.append(x.copy())
+
+        X.append(x.copy())
 
     simulations.append([sample.copy() for sample in X])
 
