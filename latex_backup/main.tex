@@ -1,0 +1,97 @@
+\documentclass{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{appendix}
+\usepackage{graphicx}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{float}
+\usepackage[UKenglish]{babel}
+\usepackage{url}
+\usepackage{titling}
+\usepackage{multirow}
+
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator*{\argmin}{\arg\!\min}
+\DeclareMathOperator*{\argmax}{\arg\!\max}
+
+\title{Computational Statistics\\Project Report}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+In diesem Projekt reimplementiere ich den vorgeschlagenen Markov Chain Monte Carlo (MCMC) Algorithmus aus dem Paper
+\cite{lau2019} und versuche die Ergebnisse der Experimente zu reproduzieren. Der untersuchte Paper baut auf dem
+\textit{Metropolis-Hastings} MCMC Algorithmus \cite{metropolis1953} auf. \cite{liu2000}
+Der source code unter MIT Lizenz zu diesem Projekt findet sich in dem GitHub repository
+\begin{align*}
+	\texttt{github.com/rinkwitz/Adaptive\_Plateau\_MCMC}\,.
+\end{align*}  
+
+\section{Adaptive Component-wise Multiple-Try Metropolis Algorithm} Der Kernalgorithmus des Papers \cite{lau2019}
+besteht aus einem MCMC Algorithmus der drei Eigenschaften erfüllt. Der Algorithmus schlägt beim sampling mehrere
+Vorschläge aus verschiedenen Plateauverteilungen vor. Dies passiert unabhängig für alle Komponenten eines samples.
+Die Plateauverteilungen adaptieren ihre Form in Abhängigkeit von der Frequenz der akzeptierten sample Vorschläge.
+
+\subsection{Component-wise Multiple-Try Metropolis}
+TO DO ...
+
+\subsection{Plateau Proposal Distributions}
+TO DO ...
+
+\subsection{Adaption of Proposal Distributions}
+TO DO ...
+
+\section{Experiments and Results}
+\subsection{Performance Measures}
+Die Autoren in dem Paper \cite{lau2019} verwenden zwei performance measures, um die Wirksamkeit des implementierten
+Algorithmus zu untersuchen. Dies ist zum einen die integrated autocorrelation times (ACT), welche in $R$ MCMC
+Simulationen mit jeweils $N$ Schritten für $K$ Komponenten berechnet wird. Sei im Folgenden
+$X_t^{(r)}=(X_{t,1}^{(r)},...,X_{t,K}^{(r)})$ das Ergebnis der $r$-ten MCMC Simulation bei Schritt $t$, wobei
+$r\in\{1,...,R\}$ und $t\in\{1,...,N\}$. Die Implementierung benutzt einen \textit{initial positive sequence estimator}
+wie ihn \cite{geyer1992} verwendet. Dafür wird zunächst die komponentenweise die empirische Autokovarianz bestimmt um
+die lagged autocovariance $\gamma_{i,k}^{(r)}$ mit $k\in\{1,...,K\}$ zu schätzen. Dabei ist
+\begin{align*}
+	\hat{\gamma}_{t,k}^{(r)}&=\frac{1}{N}\sum\limits_{i=1}^{N-t}(X_{i,k}^{(r)}-\bar{X_k}^{(r)})(X_{i+t,k}^{(r)}-\bar{X_k}^{(r)})
+\end{align*} 
+wobei $\bar{X_k}^{(r)}=1/N\sum\nolimits_{i=1}^NX_{i,k}^{(r)}$ das arithmetische Mittel $k$-ten Komponente in der $r$-ten
+Simulation bezeichnet. Danach schauen wir uns die Summen
+\begin{align*}
+	\hat{\Gamma}_{m,k}^{(r)} &= \hat{\gamma}_{2m,k}^{(r)} + \hat{\gamma}_{2m+1,k}^{(r)}
+\end{align*}
+von benachbarten Autokovarianzen Paaren an. Schließlich ergibt sich die integrated autocorrelation times als
+\begin{align*}
+	\text{ACT}_k^{(r)}&=-\hat{\gamma}_{0,k}^{(r)}+2\sum\limits_{i=0}^{m}\hat{\Gamma}_{m,k}^{(r)}
+\end{align*} 
+wobei $m$ die größte natürliche Zahl ist, sodass $\hat{\Gamma}_{i,k}^{(r)} > 0$ für alle $i\in\{1,...,m\}$ gilt
+\cite{geyer1992}.
+
+\subsection{Experiments}
+TO DO ...
+
+\subsection{Technical Details of Implementation}
+TO DO ...
+
+\subsection{Results}
+TO DO ...
+
+\section{Discussion}
+TO DO ...aaaa
+
+\bibliographystyle{apalike}
+\bibliography{ref}
+\end{document}
+
+
+

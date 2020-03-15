@@ -30,7 +30,7 @@ def ACT(simulations):
             old = np.inf
             N = len(simulations[i, :, k])
             v = simulations[i, :, k].reshape(-1)
-            act[i, k] = - lagged_autocovariance(v, 0)
+            act[i, k] = -lagged_autocovariance(v, 0)
             for m in range(N):
                 if Gamma(v, m) <= 0 or Gamma(v, m) > old:
                     break

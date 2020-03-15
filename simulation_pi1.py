@@ -27,8 +27,8 @@ sigma_1 = 3.
 use_adaption = True
 eta_1 = .4
 eta_2 = .4
-L = 50
-R = 50
+L = 40
+R = 200
 use_burn_in = True
 burn_in = .5
 show_status = True
@@ -63,7 +63,7 @@ for r in range(R):
                 if show_adaption_info:
                     print('frequencies of center proposals:', [c_1[k] / L for k in range(len(c_1))])
                     print('frequencies of tail proposals:', [c_M[k] / L for k in range(len(c_M))])
-                P_n = np.sqrt(np.maximum(.99 ** n, 1 / np.sqrt(n + 1)))
+                P_n = np.maximum(.99 ** n, 1 / np.sqrt(n + 1))
                 for k in range(len(x)):
                     if np.random.rand() < P_n:
                         if c_1[k] > eta_1 * L:
