@@ -76,12 +76,12 @@
     Mithilfe von $f$ kann man die Plateau probability density distributions $T_{j,k}$, $j\in\{1,\dots,M\}$ für die trial proposals der $k$-ten Komponente definieren als
     \begin{align*}
         T_{j,k}(x,y)&=\begin{cases}
-                          f(y;x,\delta_1,\sigma,\sigma)&\quad,j=1\\
-                          \frac 12 f(y;x-\delta_1-\delta,\delta,\sigma,\sigma)+\frac 12 f(y;x+\delta_1+\delta,\delta,\sigma,\sigma)&\quad,j=2,\dots M-1\\
-                          \frac 12 f(y;x-\delta_1-\delta,\delta,\sigma_0,\sigma)+\frac 12 f(y;x+\delta_1+\delta,\delta,\sigma,\sigma_1)&\quad,j=M
+                          f(y;x,\delta_1,\sigma,\sigma)&,j=1\\
+                          \frac 12 f(y;x-(2j-3)\delta-\delta_1,\delta,\sigma,\sigma)+\frac 12 f(y;x+(2j-3)\delta+\delta_1,\delta,\sigma,\sigma)&,j=2,\dots M-1\\
+                          \frac 12 f(y;x-(2M-3)\delta-\delta_1,\delta,\sigma_0,\sigma)+\frac 12 f(y;x+(2M-3)\delta+\delta_1,\delta,\sigma,\sigma_1)&,j=M
         \end{cases}
     \end{align*}
-    mit Werten $\delta_1,\delta,\sigma,\sigma_0,\sigma_1>0$ \cite{lau2019}. In Figure \ref{trial_proposals}
+    mit Werten $\delta_1,\delta,\sigma,\sigma_0,\sigma_1>0$. In Figure \ref{trial_proposals}
     sieht man die trial proposal propability density distributions für die Parameter $M=5, \delta_1=\delta=1,\sigma=0.05,\sigma_0=\sigma_1=0.5$. Man erkennt, dass sich die
     Verteilungen nur an ihren exponential decaying tails überschneiden. Die äußeren tails fallen durch die größeren $\sigma_0, \sigma_1$ Werte
     flacher ab als die restlichen tails. In dem Paper \cite{lau2019} verwenden die Autoren durchgehend die Werte $\delta=\delta_1=2,\sigma=0.05,\sigma_0=\sigma_1=3$.
@@ -99,21 +99,28 @@
 	angewendet. Sei $x=(x_1,\dots,x_d)$ der letzte gesampelte Kandidat des MCMC Algorithmus, dann schlägt der Algorithmus trials $z_j$
     für $i=1,\dots,M$ in dem er diese aus den Verteilungen $T_{j,k}(x_k,\cdot)$ sampelt. In meiner Reeimplementierung des Papers verwende
     ich dazu ein rejection sampling Verfahren \cite{rejection_sampling}. Dabei verwende ich eine gleichförmige Verteilung zum Erzeugen der samples über den folgenden Intervallen
-    \begin{itemize}
-        \item $j=1:\quad I_1=[x_k-\delta_1-t_1,x_k+\delta_1+t_1]$ mit $t_1 = \sqrt{-2\sigma^2\log(0.0001C(\delta_1,\sigma,\sigma))}$,
-        \item $j=2,\dots,M-1:\quad I_2=[x_k-2(j+1)\delta-\delta_1-t_2,x-2j\delta-\delta_1+t_2]\cup[x_k+2j\delta+\delta_1-t_2,x+2(j+1)\delta-\delta_1+t_2]$ mit $t_2=\sqrt{-2\sigma^2\log(0.0002C(\delta,\sigma,\sigma))}$, und
-        \item $j=M:\quad I_3=[x_k-2(M+1)\delta-\delta_1-t_{32},x_k-2M\delta-\delta_1+t_{31}]\cup[x_k+2M\delta+\delta_1-t_{31},x_k+2(M+1)\delta+\delta_1+t_{32}]$ mit $t_{31}=\sqrt{-2\sigma^2\log(0.0002C(\delta,\sigma,\sigma_0))},t_{32}=\sqrt{-2\sigma_0^2\log(0.0002C(\delta,\sigma,\sigma_0))}$.
-    \end{itemize}
+%    \begin{itemize}
+%        \item $j=1:I_1=[x_k-\delta_1-t_1,x_k+\delta_1+t_1]$ mit $t_1 = \sqrt{-2\sigma^2\log(0.0001C(\delta_1,\sigma,\sigma))}$,
+%        \item $j=2,\dots,M-1:I_2=[x_k-2(j+1)\delta-\delta_1-t_2,x-2j\delta-\delta_1+t_2]\cup[x_k+2j\delta+\delta_1-t_2,x+2(j+1)\delta-\delta_1+t_2]$ mit $t_2=\sqrt{-2\sigma^2\log(0.0002C(\delta,\sigma,\sigma))}$, und
+%        \item $j=M:I_3=[x_k-2(M+1)\delta-\delta_1-t_{32},x_k-2M\delta-\delta_1+t_{31}]\cup[x_k+2M\delta+\delta_1-t_{31},x_k+2(M+1)\delta+\delta_1+t_{32}]$ mit $t_{31}=\sqrt{-2\sigma^2\log(0.0002C(\delta,\sigma,\sigma_0))},t_{32}=\sqrt{-2\sigma_0^2\log(0.0002C(\delta,\sigma,\sigma_0))}$.
+%    \end{itemize}
+    \begin{align*}
+        I_j = \begin{cases}
+                  [x_k-\delta_1-t_1,x_k+\delta_1+t_1]\\\text{ for }j=1\text{ with }t_1 = \sqrt{-2\sigma^2\log(0.0001C(\delta_1,\sigma,\sigma))},\vspace{.25cm}\\
+                  [x_k-2(j+1)\delta-\delta_1-t_2,x-2j\delta-\delta_1+t_2]\cup[x_k+2j\delta+\delta_1-t_2,x+2(j+1)\delta-\delta_1+t_2]\\\text{ for }j=2,\dots,M-1\text{ with }t_2=\sqrt{-2\sigma^2\log(0.0002C(\delta,\sigma,\sigma))},\text{ or}\vspace{.25cm}\\
+                  [x_k-2(M+1)\delta-\delta_1-t_{32},x_k-2M\delta-\delta_1+t_{31}]\cup[x_k+2M\delta+\delta_1-t_{31},x_k+2(M+1)\delta+\delta_1+t_{32}]\\\text{ for }j=M\text{ with }t_{31}=\sqrt{-2\sigma^2\log(0.0002C(\delta,\sigma,\sigma_0))},t_{32}=\sqrt{-2\sigma_0^2\log(0.0002C(\delta,\sigma,\sigma_0))}.
+        \end{cases}
+    \end{align*}
     Diese Intervalle ermöglichen es in dem Bereich aus $T_{j,k}(x_k,\cdot)$ effektiv zu samplen wo die probability density function größer als $0.0001$ ist.
     Dazu sampelt man solange ein $u\sim U(0,1)$ und ein $y\sim U(I_i)$ bis
     \begin{align*}
         u < \frac{T_{j,k}(x_k,y)}{c|I_i|}
     \end{align*}
-    wobei $|I_i|$ die Breite des verwendeten Intervalls $I_i$ ist, $g_j$ die probability density function der gleichmäßogen Verteilung über $I_j$ ist und $c$ situationsabhängig folgende Werte hat
+    erfüllt ist wobei $|I_j|$ die Breite des verwendeten Intervalls $I_j$ ist, $g_j$ die probability density function der gleichmäßigen Verteilung über $I_j$ ist und $c_j$ situationsabhängig folgende Werte hat
     \begin{itemize}
-        \item $j=1:\quad c=\sup\limits_{y\in I_1}\frac{T_{1,k}(x_k,y)}{g_1(y)}=\frac{|I_1|}{C(\delta_1,\sigma,\sigma)}$,
-        \item $j=2:\quad c=\sup\limits_{y\in I_j}\frac{T_{j,k}(x_k,y)}{g_j(y)}=\frac{|I_j|}{2C(\delta,\sigma,\sigma)}$, und
-        \item $j=M:\quad c=\sup\limits_{y\in I_M}\frac{T_{M,k}(x_k,y)}{g_M(y)}=\frac{|I_M|}{2C(\delta,\sigma,\sigma_0)}$.
+        \item $j=1:\quad c_1=\sup\limits_{y\in I_1}\frac{T_{1,k}(x_k,y)}{g_1(y)}=\frac{|I_1|}{C(\delta_1,\sigma,\sigma)}$,
+        \item $j=2:\quad c_j=\sup\limits_{y\in I_j}\frac{T_{j,k}(x_k,y)}{g_j(y)}=\frac{|I_j|}{2C(\delta,\sigma,\sigma)}$, und
+        \item $j=M:\quad c_M=\sup\limits_{y\in I_M}\frac{T_{M,k}(x_k,y)}{g_M(y)}=\frac{|I_M|}{2C(\delta,\sigma,\sigma_0)}$.
     \end{itemize}
 
 

@@ -130,7 +130,7 @@ for target_dist in target_dists:
     x_initial = np.random.randn(dim_dict[target_dist])
     start = time.time()
 
-    p = Pool(2)
+    p = Pool(4)
     simulations = p.map(run, [(x_initial.copy(), r) for r in range(R)])
     simulations = np.array(simulations)
     np.save(pathlib.Path('simulations')/'simulation_{}.npy'.format(target_dist), simulations)
