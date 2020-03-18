@@ -120,7 +120,6 @@ show_status = True
 show_status_interval = 500
 show_adaption_info = False
 target_dists = ['pi_1', 'pi_2', 'pi_3', 'pi_4']
-target_dists = ['pi_4']
 
 for target_dist in target_dists:
     #adjustable deltas:

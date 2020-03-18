@@ -118,4 +118,3 @@ for r in range(R):
 
 simulations = np.array(simulations)
 np.save(pathlib.Path('simulations')/'simulation_{}.npy'.format(target_dist), simulations)
-#

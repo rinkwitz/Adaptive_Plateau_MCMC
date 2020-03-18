@@ -52,5 +52,3 @@ def ASJD(simulations):
         for k in range(num_components):
             asjd[i, k] = np.mean((simulations[i, 1:, k] - simulations[i, :-1, k]) ** 2)
     return asjd
-
-#
