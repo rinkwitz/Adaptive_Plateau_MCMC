@@ -10,3 +10,5 @@ def integrand_3(x_1, x_2):
 
 pi_3_normalizing_const = 1 / dblquad(lambda x_2, x_1: integrand_3(x_1, x_2), -np.inf, np.inf, lambda x_1: -np.inf,
                                      lambda x_1: np.inf)[0]
+
+#

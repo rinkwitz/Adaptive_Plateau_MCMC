@@ -15,3 +15,4 @@ plt.show()
 
 C = np.sqrt(2 * np.pi * .05 ** 2) / 2 + np.sqrt(2 * np.pi * .5 ** 2) / 2 + 2 * 1
 print(1 / C * np.exp(-(10-9)**2/(2*.5**2)) / 2)
+#

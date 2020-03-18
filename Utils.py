@@ -118,7 +118,8 @@ def trial_weight(z, x, k, j, M, target_dist, delta, delta_1, sigma, sigma_0, sig
 
 def lambda_function(x, y, j, M, delta, delta_1, sigma, sigma_0, sigma_1):
     alpha = 2.5
-    return trial(x, y, j, M, delta, delta_1, sigma, sigma_0, sigma_1) * np.abs(x - y) ** alpha
+    return np.abs(x - y) ** alpha
+    #return trial(x, y, j, M, delta, delta_1, sigma, sigma_0, sigma_1) * np.abs(x - y) ** alpha
 
 
 def draw_from_z_proportional_to_w(z, w):
