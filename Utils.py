@@ -36,7 +36,7 @@ def rejection_sampling_trial(x, j, M, delta, delta_1, sigma, sigma_0, sigma_1):
         lower_bound = x - delta_1 - tail_width
         upper_bound = x + delta_1 + tail_width
         g = 1 / (upper_bound - lower_bound)
-        c = (1 / np.sqrt(2 * np.pi * .05 ** 2) / 2 + np.sqrt(2 * np.pi * .05 ** 2) / 2 + 2 * delta_1) / g
+        c = g / C
     elif j < M - 1:
         C = np.sqrt(2 * np.pi * sigma ** 2) / 2 + np.sqrt(2 * np.pi * sigma ** 2) / 2 + 2 * delta
         tail_width = np.sqrt(np.log(2 * C * tail_lowest) * (-2 * sigma ** 2))
@@ -45,7 +45,7 @@ def rejection_sampling_trial(x, j, M, delta, delta_1, sigma, sigma_0, sigma_1):
         lower_bound_2 = x + 2 * (j - 1) * delta + delta_1 - tail_width
         upper_bound_2 = x + 2 * j * delta + delta_1 + tail_width
         g = 1 / (upper_bound_1 - lower_bound_1)
-        c = (1 / np.sqrt(2 * np.pi * .05 ** 2) / 2 + np.sqrt(2 * np.pi * .05 ** 2) / 2 + 2 * delta) / (2 * g)
+        c = g / C
     else:
         C = np.sqrt(2 * np.pi * sigma ** 2) / 2 + np.sqrt(2 * np.pi * sigma_0 ** 2) / 2 + 2 * delta
         tail_width_1 = np.sqrt(np.log(2 * C * tail_lowest) * (-2 * sigma ** 2))
@@ -55,7 +55,7 @@ def rejection_sampling_trial(x, j, M, delta, delta_1, sigma, sigma_0, sigma_1):
         lower_bound_2 = x + 2 * (j - 1) * delta + delta_1 - tail_width_1
         upper_bound_2 = x + 2 * j * delta + delta_1 + tail_width_2
         g = 1 / (upper_bound_1 - lower_bound_1)
-        c = (1 / np.sqrt(2 * np.pi * 3 ** 2) / 2 + np.sqrt(2 * np.pi * .05 ** 2) / 2 + 2 * delta) / (2 * g)
+        c = g / C
     while True:
         if j == 0:
             Y = np.random.uniform(lower_bound, upper_bound)
@@ -136,8 +136,13 @@ def draw_from_z_proportional_to_w(z, w):
 
 def visualize_ACT(act, target_dist, show_plot = True):
     num_components = act.shape[1]
+    fig, axes = plt.subplots(1, num_components)
+    fig.set_size_inches(9.6, 4.8)
     for k in range(num_components):
-        ax = plt.subplot(1, num_components, k + 1)
+        if num_components != 1:
+            ax = axes[k]
+        else:
+            ax = axes
         data = act[:, k]
         ax.set_xlabel('component {}'.format(k + 1))
         ax.set_ylabel('ACT')
@@ -151,8 +156,13 @@ def visualize_ACT(act, target_dist, show_plot = True):
 
 def visualize_log_ACT(log_act, target_dist, show_plot = True):
     num_components = log_act.shape[1]
+    fig, axes = plt.subplots(1, num_components)
+    fig.set_size_inches(9.6, 4.8)
     for k in range(num_components):
-        ax = plt.subplot(1, num_components, k + 1)
+        if num_components != 1:
+            ax = axes[k]
+        else:
+            ax = axes
         data = log_act[:, k]
         ax.set_xlabel('component {}'.format(k + 1))
         ax.set_ylabel('log_ACT')
@@ -167,8 +177,13 @@ def visualize_log_ACT(log_act, target_dist, show_plot = True):
 
 def visualize_ASJD(asjd, target_dist, show_plot = True):
     num_components = asjd.shape[1]
+    fig, axes = plt.subplots(1, num_components)
+    fig.set_size_inches(9.6, 4.8)
     for k in range(num_components):
-        ax = plt.subplot(1, num_components, k + 1)
+        if num_components != 1:
+            ax = axes[k]
+        else:
+            ax = axes
         data = asjd[:, k]
         ax.set_xlabel('component {}'.format(k + 1))
         ax.set_ylabel('ASJD')
