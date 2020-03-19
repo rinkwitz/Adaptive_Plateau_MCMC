@@ -5,8 +5,7 @@ from Utils import *
 show_plots = False
 np.set_printoptions(linewidth=160)
 
-for target_dist in ['pi_3', 'pi_4']:
-#for target_dist in ['pi_1', 'pi_2', 'pi_3', 'pi_4']:
+for target_dist in ['pi_1', 'pi_2', 'pi_3', 'pi_4']:
     path = pathlib.Path('simulations/simulation_{}.npy'.format(target_dist))
     if path.exists():
         simulations = np.load(path)

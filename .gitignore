@@ -1,0 +1,13 @@
+/testumgebung.py
+/testumgebung2.py
+/venv
+/out/
+/latex/main.synctex.gz
+/latex/main.log
+/latex/main.blg
+/latex/main.bbl
+/latex/main.aux
+/figs/ACT_pi_test.png
+/figs/ASDJ_pi_test.png
+/simulations/simulation_pi_3.npy
+/simulations/simulation_pi_4.npy

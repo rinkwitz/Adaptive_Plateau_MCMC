@@ -12,6 +12,3 @@ for j in range(M):
 plt.legend(('j = 1', 'j = 2', 'j = 3', 'j = 4', 'j = 5'), loc='upper right')
 plt.savefig(path)
 plt.show()
-
-C = np.sqrt(2 * np.pi * .05 ** 2) / 2 + np.sqrt(2 * np.pi * .5 ** 2) / 2 + 2 * 1
-print(1 / C * np.exp(-(10-9)**2/(2*.5**2)) / 2)

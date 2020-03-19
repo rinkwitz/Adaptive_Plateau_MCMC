@@ -14,6 +14,7 @@
 \usepackage{url}
 \usepackage{titling}
 \usepackage{multirow}
+\usepackage{subcaption}
 
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
@@ -160,8 +161,82 @@
     TO DO ...
 
     \subsection{Results}
-    TO DO ...
+    Die zu den Experimenten zugehörigen Violinen plots findet man für die Zielverteilungen $\pi_1$, $\pi_2$, $\pi_3$ und $\pi_4$ finden sich
+    in den Figures \ref{violin_plots_pi_1}, \ref{violin_plots_pi_2}, \ref{violin_plots_pi_3} und \ref{violin_plots_pi_4}. Dort findet man
+    die komponenteweise Darstellung der ACT Werte in den Subfigures \ref{violin_plots_pi_1_act}, \ref{violin_plots_pi_2_act}, \ref{violin_plots_pi_3_act} und \ref{violin_plots_pi_1_act}, sowie
+    die komponentenweise Darstellung der ASJD Werte in den Subfigures \ref{violin_plots_pi_1_asjd}, \ref{violin_plots_pi_2_asjd}, \ref{violin_plots_pi_3_asjd} und \ref{violin_plots_pi_4_asjd}.
 
+    \begin{figure}
+        \centering
+        \begin{subfigure}{0.45\textheight}
+              \centering
+              \includegraphics[width=.8\linewidth]{../figs/ACT_pi_1.png}
+              \caption{komponenteweise ACT Werte für Zielverteilung $\pi_1$}
+              \label{violin_plots_pi_1_act}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textheight}
+              \centering
+              \includegraphics[width=.8\linewidth]{../figs/ASJD_pi_1.png}
+              \caption{komponenteweise ASJD Werte für Zielverteilung $\pi_1$}
+              \label{violin_plots_pi_1_asjd}
+        \end{subfigure}
+        \caption{Violin plots of performance measures for target distribution $\pi_1$}
+        \label{violin_plots_pi_1}
+    \end{figure}
+
+    \begin{figure}
+        \centering
+        \begin{subfigure}{0.45\textheight}
+              \centering
+              \includegraphics[width=.8\linewidth]{../figs/ACT_pi_2.png}
+              \caption{komponenteweise ACT Werte für Zielverteilung $\pi_2$}
+              \label{violin_plots_pi_2_act}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textheight}
+              \centering
+              \includegraphics[width=.8\linewidth]{../figs/ASJD_pi_2.png}
+              \caption{komponenteweise ASJD Werte für Zielverteilung $\pi_2$}
+              \label{violin_plots_pi_2_asjd}
+        \end{subfigure}
+        \caption{Violin plots of performance measures for target distribution $\pi_2$}
+        \label{violin_plots_pi_2}
+    \end{figure}
+
+    \begin{figure}
+        \centering
+        \begin{subfigure}{0.45\textheight}
+              \centering
+              \includegraphics[width=.8\linewidth]{../figs/ACT_pi_3.png}
+              \caption{komponenteweise ACT Werte für Zielverteilung $\pi_3$}
+              \label{violin_plots_pi_3_act}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textheight}
+              \centering
+              \includegraphics[width=.8\linewidth]{../figs/ASJD_pi_3.png}
+              \caption{komponenteweise ASJD Werte für Zielverteilung $\pi_3$}
+              \label{violin_plots_pi_3_asjd}
+        \end{subfigure}
+        \caption{Violin plots of performance measures for target distribution $\pi_3$}
+        \label{violin_plots_pi_3}
+    \end{figure}
+
+    \begin{figure}
+        \centering
+        \begin{subfigure}{0.45\textheight}
+              \centering
+              \includegraphics[width=.8\linewidth]{../figs/ACT_pi_4.png}
+              \caption{komponenteweise ACT Werte für Zielverteilung $\pi_4$}
+              \label{violin_plots_pi_4_act}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textheight}
+              \centering
+              \includegraphics[width=.8\linewidth]{../figs/ASJD_pi_4.png}
+              \caption{komponenteweise ASJD Werte für Zielverteilung $\pi_4$}
+              \label{violin_plots_pi_4_asjd}
+        \end{subfigure}
+        \caption{Violin plots of performance measures for target distribution $\pi_4$}
+        \label{violin_plots_pi_4}
+    \end{figure}
 
     \section{Discussion}
     TO DO ...
@@ -169,6 +244,3 @@
     \bibliographystyle{apalike}
     \bibliography{ref}
 \end{document}
-%
-
-

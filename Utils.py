@@ -191,7 +191,7 @@ def visualize_ASJD(asjd, target_dist, show_plot = True):
         ax.set_xticks([])
         ax.violinplot(data, showmeans=False, showmedians=True)
     plt.tight_layout()
-    plt.savefig(pathlib.Path('figs')/'ASDJ_{}.png'.format(target_dist))
+    plt.savefig(pathlib.Path('figs')/'ASJD_{}.png'.format(target_dist))
     if show_plot:
         plt.show()
     plt.close()
