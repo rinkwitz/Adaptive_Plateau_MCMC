@@ -155,6 +155,7 @@ def visualize_ACT(act, target_dist, show_plot = True):
         plt.show()
     plt.close()
 
+
 def visualize_log_ACT(log_act, target_dist, show_plot = True):
     num_components = log_act.shape[1]
     fig, axes = plt.subplots(1, num_components)
