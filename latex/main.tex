@@ -65,9 +65,9 @@
 	an unnormalized density function
 	\begin{align*}
 		\tilde{f}(y;\mu,\delta,\sigma_1,\sigma_2)&=\begin{cases}
-			\exp\left( -\frac{1}{2\sigma_1^2}[y-(\mu-\delta)]^2 \right)&\quad ,y<\mu-\delta\\
-           1&\quad ,\mu-\delta\leq y\leq\mu+\delta\\
-           \exp\left( -\frac{1}{2\sigma_2^2}[y-(\mu+\delta)]^2 \right)&\quad ,y>\mu+\delta
+			\exp\left( -\frac{1}{2\sigma_1^2}[y-(\mu-\delta)]^2 \right),&\quad y<\mu-\delta\\
+           1,&\quad\mu-\delta\leq y\leq\mu+\delta\\
+           \exp\left( -\frac{1}{2\sigma_2^2}[y-(\mu+\delta)]^2 \right),&\quad y>\mu+\delta
 		\end{cases}
 	\end{align*}
     and then calculate the following integral
@@ -82,9 +82,9 @@
     Using $f$ you can define the plateau probability density distributions $T_{j,k}$, $j\in\{1,\dots,M\}$ for the trial proposals of the $k$-th component as
     \begin{align*}
         T_{j,k}(x,y)&=\begin{cases}
-                          f(y;x,\delta_1,\sigma,\sigma)&,j=1\\
-                          \frac 12 f(y;x-(2j-3)\delta-\delta_1,\delta,\sigma,\sigma)+\frac 12 f(y;x+(2j-3)\delta+\delta_1,\delta,\sigma,\sigma)&,j=2,\dots M-1\\
-                          \frac 12 f(y;x-(2M-3)\delta-\delta_1,\delta,\sigma_0,\sigma)+\frac 12 f(y;x+(2M-3)\delta+\delta_1,\delta,\sigma,\sigma_1)&,j=M
+                          f(y;x,\delta_1,\sigma,\sigma),&j=1\\
+                          \frac 12 f(y;x-(2j-3)\delta-\delta_1,\delta,\sigma,\sigma)+\frac 12 f(y;x+(2j-3)\delta+\delta_1,\delta,\sigma,\sigma),&j=2,\dots M-1\\
+                          \frac 12 f(y;x-(2M-3)\delta-\delta_1,\delta,\sigma_0,\sigma)+\frac 12 f(y;x+(2M-3)\delta+\delta_1,\delta,\sigma,\sigma_1),&j=M
         \end{cases}
     \end{align*}
     with values $\delta_1,\delta,\sigma,\sigma_0,\sigma_1>0$. In figure \ref{trial_proposals}
@@ -174,7 +174,7 @@
         \hat{\tau}_{k}^{(r)}&=1+2\sum\limits_{\tau=1}^M\hat{p}_{\tau,k}^{(r)}
     \end{align*}
     \cite{autocorrelation_blog} where $M\ll N$. To determine $M$ the implementation uses a \textit{initial monotone sequence estimator}
-    as introduced by \cite [geyer1992]. where $M$ is the largest natural number, so that $\hat{p}_{\tau,k}^{(r)} > 0$ applies to all $\tau\in\{1,\dots,2M+1\}$ and
+    as introduced by \cite{geyer1992}. where $M$ is the largest natural number, so that $\hat{p}_{\tau,k}^{(r)} > 0$ applies to all $\tau\in\{1,\dots,2M+1\}$ and
     and the subsequence $(\hat{p}_{2\tau,k}^{(r)} + \hat{p}_{2\tau+1,k}^{(r)})_{\tau=1,\dots,M}$ is monotone \cite{geyer1992}.
 
     \subsubsection{Average Squared Jump Distance}
@@ -386,7 +386,7 @@
     \section{Discussion}
     The results partly differ significantly from those of the simulations in \cite{lau2019}.
     However, the ratios of the order of magnitude between the components of the ACT and ASJD values appear to be largely consistent.
-    In the ACT distributions, there is a close similarity between \cite{lau2019} and this reimplementation (tables \ref{stat_results_act, stat_results_log_act}) in the target distributions
+    In the ACT distributions, there is a close similarity between \cite{lau2019} and this reimplementation (Tables \ref{stat_results_act} and \ref{stat_results_log_act}) in the target distributions
     $\pi_2$ and $\pi_4$, but large deviations for $\pi_1$ and $\pi_3$. There is also a high similarity in the ASJD distributions for the target distributions $\pi_2$ and $\pi_4$
     between \cite{lau2019} and this project (Table \ref{stat_results_asjd}). For the target distributions $\pi_1$ and $\pi_3$ we can observe
     differences in the values, but the ratios between the components are very similar to the ones in \cite{lau2019}.
