@@ -14,6 +14,7 @@
 \usepackage{url}
 \usepackage{titling}
 \usepackage{multirow}
+\usepackage{setspace}
 \usepackage{subcaption}
 
 \usepackage{algorithm}
@@ -31,36 +32,37 @@
 
 \begin{document}
 
+    \setstretch{1.25}
+
     \maketitle
 
     \section{Introduction}
     The Markov Chain Monte Carlo (MCMC) sampling tries to investigate properties of distributions by drawing
     random samples. This is a sequential process, where the drawing of a random sample at any given
-    time depends only on its immediate predecessor. In diesem Projekt reimplementiere ich eine Variante des MCMC Algorithmus aus dem Paper
-    \cite{lau2019} und versuche die Ergebnisse der Experimente zu reproduzieren. Der hier betrachtete Paper baut auf den Ideen von
-    \cite{metropolis1953,geyer1992,liu2000} und \cite{yang2019} auf.
-    Der source code unter MIT Lizenz zu diesem Projekt findet sich in dem GitHub repository
+    time depends only on its immediate predecessor. In this project a variant of the MCMC algorithm from the paper
+    \cite{lau2019} is reimplemented and an attempt is made to reproduce the results of the experiments. The paper under consideration builds on the ideas of
+    \cite{metropolis1953,geyer1992,liu2000} and \cite{yang2019}.
+    The source code under MIT license for this project can be found in the GitHub repository
     \begin{align*}
         \texttt{github.com/rinkwitz/Adaptive\_Plateau\_MCMC}\,.
     \end{align*}
-    Da die Simulation der Markov chains sehr zeitaufwendig ist, kann man schon berechnete Läufe unter dem Link
+    Since the simulation of Markov chains is very time-consuming, you can download already simulated MCMC runs under the link
     \begin{align*}
-        \texttt{drive.google.com/file/d/1OzUR6-axu2M8hrUERXLregBqmXdpoS-Y/view?usp=sharing}
+        \texttt{drive.google.com/file/d/1OzUR6-axu2M8hrUERXLregBqmXdpoS-Y/view?usp=sharing}\,.
     \end{align*}
-    herunterladen.
 
-    \section{Adaptive Component-wise Multiple-Try Metropolis Algorithm} Der Kernalgorithmus
-    des Papers \cite{lau2019} besteht aus einem MCMC Algorithmus der drei Eigenschaften erfüllt. Der Algorithmus schlägt
-    beim sampling mehrere Vorschläge aus verschiedenen Plateauverteilungen vor. Dies passiert unabhängig für alle
-    Komponenten eines samples. Die Plateauverteilungen adaptieren ihre Form in Abhängigkeit von der Frequenz der akzeptierten sample Vorschläge.
+    \section{Adaptive Component-wise Multiple-Try Metropolis Algorithm} The core algorithm
+    of the paper \cite{lau2019} consists of a MCMC algorithm which fulfills three properties. First, the algorithm suggests
+    several suggestions from different plateau distributions during sampling. This happens independently for all
+    components of a sample. Lastly, plateau distributions adapt their shape depending on the frequency of the accepted sample proposals.
 
 	\subsection{Plateau Proposal Distributions}
-    Der MCMC Algorithmus in \cite{lau2019} verwendet zum sampling von Vorschlägen \textit{non-overlapping plateau proposal distributions}.
-	Die dabei verwendete grundlegende probability distribution function $f$ ist eine Kombination einer uniform distribution
-	mit exponentiell decaying tails. Dabei ist die Verteilung $f$ konstant um einen Mittelwert $\mu$ in dem abgeschlossenen Intervall $[\mu-\delta,\mu+\delta]$ mit $\delta > 0$.
-	Ausserhalb dieses Intervall folgt die Verteilung einem exponentiellen Verfall dessen tail Breite durch ein seitenabhängiges $\sigma_i >0$ bestimmt wird,
-	je nachdem ob man sich auf der linken oder rechten Seite des Intervalls $[\mu-\delta,\mu+\delta]$ befindet. Definiert man
-	eine unnormalisierte Verteilungsfunktion
+    The MCMC algorithm in \cite{lau2019} uses \textit{non-overlapping plateau proposal distributions} for sampling.
+	The underlying probability density function $f$ is a combination of the density of a uniform distribution
+	with exponential decaying tails. Here the density $f$ is constant around a mean value $\mu$ in the closed interval $[\mu-\delta,\mu+\delta]$ with $\delta > 0$.
+	Outside this interval the distribution follows an exponential decay with its tail width determined by $\sigma_i > 0$,
+	depending on whether you are on the left or right side of the interval $[\mu-\delta,\mu+\delta]$. If you define
+	an unnormalized density function
 	\begin{align*}
 		\tilde{f}(y;\mu,\delta,\sigma_1,\sigma_2)&=\begin{cases}
 			\exp\left( -\frac{1}{2\sigma_1^2}[y-(\mu-\delta)]^2 \right)&\quad ,y<\mu-\delta\\
@@ -68,7 +70,7 @@
            \exp\left( -\frac{1}{2\sigma_2^2}[y-(\mu+\delta)]^2 \right)&\quad ,y>\mu+\delta
 		\end{cases}
 	\end{align*}
-    und berechnet das folgende Integral
+    and then calculate the following integral
     \begin{align*}
         C(\delta,\sigma_1,\sigma_2)&=\int\limits_{-\infty}^\infty\tilde{f}(y;\mu,\delta,\sigma_1,\sigma_2) dy\\
         &= \int\limits_{-\infty}^{\mu-\delta}\exp\left( -\frac{1}{2\sigma_1^2}[y-(\mu-\delta)]^2 \right)dy+
@@ -76,8 +78,8 @@
         \int\limits_{\mu+\delta}^{\infty}\exp\left( -\frac{1}{2\sigma_2^2}[y-(\mu+\delta)]^2 \right)dy\\
         &=\frac{\sqrt{2\pi\sigma_1^2}}{2}+2\delta+\frac{\sqrt{2\pi\sigma_1^2}}{2}
     \end{align*}
-    als die Summen von 2 halben Gausschen Integralen und einem Integral über eine konstatne Funktion, dann ergibt sich die normalisierte Verteilungsfunktion $f(y;\mu,\delta,\sigma_1,\sigma_2)=C(\delta,\sigma_1,\sigma_2)^{-1}\tilde{f}(y;\mu,\delta,\sigma_1,\sigma_2)$ \cite{lau2019}.
-    Mithilfe von $f$ kann man die Plateau probability density distributions $T_{j,k}$, $j\in\{1,\dots,M\}$ für die trial proposals der $k$-ten Komponente definieren als
+    as the sums of 2 half gaussian integrals and one integral over a constant function, then the normalized probability density function is $f(y; \mu,\delta,\sigma_1,\sigma_2)=C(\delta,\sigma_1,\sigma_2)^{-1}\tilde{f}(y;\mu,\delta,\sigma_1,\sigma_2)$ \cite{lau2019}.
+    Using $f$ you can define the plateau probability density distributions $T_{j,k}$, $j\in\{1,\dots,M\}$ for the trial proposals of the $k$-th component as
     \begin{align*}
         T_{j,k}(x,y)&=\begin{cases}
                           f(y;x,\delta_1,\sigma,\sigma)&,j=1\\
@@ -85,10 +87,10 @@
                           \frac 12 f(y;x-(2M-3)\delta-\delta_1,\delta,\sigma_0,\sigma)+\frac 12 f(y;x+(2M-3)\delta+\delta_1,\delta,\sigma,\sigma_1)&,j=M
         \end{cases}
     \end{align*}
-    mit Werten $\delta_1,\delta,\sigma,\sigma_0,\sigma_1>0$. In Figure \ref{trial_proposals}
-    sieht man die trial proposal propability density distributions für die Parameter $M=5, \delta_1=\delta=1,\sigma=0.05,\sigma_0=\sigma_1=0.5$. Man erkennt, dass sich die
-    Verteilungen nur an ihren exponential decaying tails überschneiden. Die äußeren tails fallen durch die größeren $\sigma_0, \sigma_1$ Werte
-    flacher ab als die restlichen tails. In dem Paper \cite{lau2019} verwenden die Autoren durchgehend die Werte $\delta=\delta_1=2,\sigma=0.05,\sigma_0=\sigma_1=3$.
+    with values $\delta_1,\delta,\sigma,\sigma_0,\sigma_1>0$. In figure \ref{trial_proposals}
+    you can see the trial proposal propability density distributions for the parameters $M=5, \delta_1=\delta=1,\sigma=0.05,\sigma_0=\sigma_1=0.5$. One can see that the
+    distributions overlap only at their exponential decaying tails. The outer tails decrease with the larger $\sigma_0, \sigma_1$ values
+    shallower than the remaining tails. In the paper \cite{lau2019}, the authors consistently use the values $\delta=\delta_1=2,\sigma=0.05,\sigma_0=\sigma_1=3$.
 
     \begin{figure}
         \centering
@@ -97,12 +99,11 @@
         \label{trial_proposals}
     \end{figure}
 
-    \subsection{Component-wise Multiple-Try Metropolis} Der \textit{Component-wise Multiple-Try Metropolis} Algorithmus \cite[Algorithm 1]{lau2019},
-    welcher die Grundlage des Sampling Verfahrens bildet, startet von einer Startposition
-	$x_0\in\mathbb{R}^d$. Für jede MCMC Realisationen $x_n$ mit $n\in\{1,\dots,N\}$ wird für jede der $d$ Komponenten das folgende Verfahren
-	angewendet. Sei $x=(x_1,\dots,x_d)$ der letzte gesampelte Kandidat des MCMC Algorithmus, dann schlägt der Algorithmus trials $z_j$
-    für $i=1,\dots,M$ in dem er diese aus den Verteilungen $T_{j,k}(x_k,\cdot)$ sampelt. In meiner Reeimplementierung des Papers verwende
-    ich dazu ein rejection sampling Verfahren \cite{rejection_sampling}. Dabei verwende ich eine gleichförmige Verteilung zum Erzeugen der samples über den folgenden Intervallen
+    \subsection{Component-wise Multiple-Try Metropolis} The component-wise multiple-try Metropolis algorithm \cite[Algorithm 1]{lau2019},
+    which forms the basis of the sampling procedure, starts from a starting position
+	$x_0\in\mathbb{R}^d$. For each MCMC realization $x_n$ with $n\in\{1,\dots,N\}$ the following procedure is used for each one of the $d$ components. If $x=(x_1,\dots,x_d)$ is the last sampled candidate of the MCMC algorithm, then the algorithm proposes trials $z_j$
+    for $i=1,\dots,M$ by sampling it from the distributions $T_{j,k}(x_k,\cdot)$. In my reimplementation
+    I use a rejection sampling procedure \cite{rejection_sampling}. For this purpose I use an uniform distribution to generate the samples over the following intervals
 %    \begin{itemize}
 %        \item $j=1:I_1=[x_k-\delta_1-t_1,x_k+\delta_1+t_1]$ mit $t_1 = \sqrt{-2\sigma^2\log(0.0001C(\delta_1,\sigma,\sigma))}$,
 %        \item $j=2,\dots,M-1:I_2=[x_k-2(j+1)\delta-\delta_1-t_2,x-2j\delta-\delta_1+t_2]\cup[x_k+2j\delta+\delta_1-t_2,x+2(j+1)\delta-\delta_1+t_2]$ mit $t_2=\sqrt{-2\sigma^2\log(0.0002C(\delta,\sigma,\sigma))}$, und
@@ -115,94 +116,91 @@
                   [x_k-2(M+1)\delta-\delta_1-t_{32},x_k-2M\delta-\delta_1+t_{31}]\cup[x_k+2M\delta+\delta_1-t_{31},x_k+2(M+1)\delta+\delta_1+t_{32}]\\\text{ for }j=M\text{ with }t_{31}=\sqrt{-2\sigma^2\log(0.0002C(\delta,\sigma,\sigma_0))},t_{32}=\sqrt{-2\sigma_0^2\log(0.0002C(\delta,\sigma,\sigma_0))}.
         \end{cases}
     \end{align*}
-    Diese Intervalle ermöglichen es in dem Bereich aus $T_{j,k}(x_k,\cdot)$ effektiv zu samplen wo die probability density function größer als $0.0001$ ist.
-    Dazu sampelt man solange ein $u\sim U(0,1)$ und ein $y\sim U(I_i)$ bis
+    These intervals enable effective sampling in the range of $T_{j,k}(x_k,\cdot)$ where the probability density function is greater than $0.0001$.
+    To do this, one samples a $u\sim U(0,1)$ and a $y\sim U(I_i)$ until
     \begin{align*}
         u < \frac{T_{j,k}(x_k,y)}{c|I_i|}
     \end{align*}
-    erfüllt ist wobei $|I_j|$ die Breite des verwendeten Intervalls $I_j$ ist, $g_j$ die probability density function der gleichmäßigen Verteilung über $I_j$ ist und $c_j$ situationsabhängig folgende Werte hat
+    is fulfilled where $|I_j|$ is the width of the used interval $I_j$, $g_j$ is the probability density function of the uniform distribution over $I_j$ and $c_j$ has the following values situation dependent
     \begin{itemize}
         \item $j=1:\quad c_1=\sup\limits_{y\in I_1}\frac{T_{1,k}(x_k,y)}{g_1(y)}=\frac{|I_1|}{C(\delta_1,\sigma,\sigma)}$,
-        \item $j=2:\quad c_j=\sup\limits_{y\in I_j}\frac{T_{j,k}(x_k,y)}{g_j(y)}=\frac{|I_j|}{2C(\delta,\sigma,\sigma)}$, und
+        \item $j=2:\quad c_j=\sup\limits_{y\in I_j}\frac{T_{j,k}(x_k,y)}{g_j(y)}=\frac{|I_j|}{2C(\delta,\sigma,\sigma)}$, and
         \item $j=M:\quad c_M=\sup\limits_{y\in I_M}\frac{T_{M,k}(x_k,y)}{g_M(y)}=\frac{|I_M|}{2C(\delta,\sigma,\sigma_0)}$.
     \end{itemize}
-    Danach werden die zu den trials assoziierten weights
+    Afterwards the weights associated with the trials are
     \begin{align*}
         w_{j,k}&=\pi((z_j;x_{[-k]}))T_{j,k}(x_k,z_j)\lambda_{j,k}(x_k,z_j),\quad\text{for }j=1,\dots,M
     \end{align*}
-    berechnet wobei $(z;x_{[-i]})\in\mathbb{R}^d$ den Vektor bezeichnet, der in allen Einträgen bis auf den $i$-ten mit $x$ identisch ist. Der $i$-te Eintrag nimmt hierbei den Wert $z$ an.
-    Zudem wird die nicht-negative und symmetrische Funktion
+    are calculated whereby $(z;x_{[-i]})\in\mathbb{R}^d$ denotes the vector, which is identical to $x$ in all entries except the $i$-th one where it takes on the value $z$.
+    In addition, the non-negative and symmetric function
     \begin{align*}
         \lambda_{j,k}(x,y)&=|y-x|^{2.5}%T_{j,k}(x,y)
     \end{align*}
-    verwendet. Dabei beziehen sich die Autoren von \cite{lau2019} auf die Ergebnisse von \cite{yang2019}. Ein hohes Gewicht bekommen somit Vorschläge $(z_j;x_{[-k]})$, die eine hohe Wahrscheinlichkeit bezüglichd der
-    Zielverteilung $\pi$ haben, deren neuer Vorschlag $z_j$ für die $k$-te Komponente bezüglich $T_{j,k}(x_k,\cdot)$ eine hohe Wahrscheinlichkeit
-    und wegen der potenzierten Abstandsfunktion $\lambda_{j,k}$ weit genug von $x_k$ entfernt ist.
-    Proportional zu den Gewichten $w_{1,k},\dots,w_{M,k}$ wird dann ein $y\in\{z_1,\dots,z_M\}$ zufällig gezogen und für $j=1,\dots,M-1$ sampelt der Algorithmus
-    $x_j^*\sim T_{j,k}(y,\cdot)$. Schließlich berechnet man
+    is used. Here the authors of \cite{lau2019} refer to the results of \cite{yang2019}. Thus, suggestions $(z_j;x_{[-k]})$ have a high weight, which have a high probability with regard to
+    the target distribution $\pi$, whose new proposal $z_j$ for the $k$-th component regarding $T_{j,k}(x_k,\cdot)$ is very likely and where the distance function $\lambda_{j,k}$ is far enough away from $x_k$.
+    Proportionally to the weights $w_{1,k},\dots,w_{M,k}$ a $y\in\{z_1,\dots,z_M\}$ is then randomly drawn and for $j=1,\dots,M-1$ the algorithm samples
+    $x_j^*\sim T_{j,k}(y,\cdot)$. Finally one calculates
     \begin{align*}
         \alpha&=\min\left\{ 1,\frac{w_{1,k}(z_1,x)+\dots+w_{M,k}(z_M,x)}{w_{1,k}(x_1^*,(y;x_{[-k]}))+\dots+w_{M-1,k}(x_{M-1}^*,(y;x_{[-k]}))+w_{M,k}(x_k,(y;x_{[-k]}))} \right\}
     \end{align*}
-    und nimmt mit dieser Wahrscheinlichkeit $\alpha$ den neuen Vorschlag an und setzt $x_n=(y;x_{[-k]})$. Andernfalls verbleibt der Algorithmus
-    bei dem alten Vorschlag und setzt $x_n=x$.
+    and with that probability $\alpha$ the algorithm accepts the new proposal and sets $x_n=(y;x_{[-k]})$. Otherwise the algorithm keeps the old proposal and sets $x_n=x$.
 
     \subsection{Adaption of Proposal Distributions}
-    In \cite{lau2019} wird vorgeschlagen die Breiten $\delta$ und $\delta_0$ der Plateauverteilungen adaptiv anzupassen.
-    In meiner Implementierung wird alle $L$ Iterationen gemessen, wie groß die Anzahlen der ausgewählten Vorschläge $c_{j,k}$ von den Plateauverteilungen $T_{j,k}$ in diesem Intervall sind.
-    Wird die mittlere Plateauverteilung überdurschnittlich oft aufgerufen, also $c_{j,k}>L\eta_1$ mit $\eta_1\in(0,1)$, dann
-    geht der Algorithmus davon aus, dass die Plateaus zu breit sind und halbiert dementsprechend $\delta$ und $\delta_1$ für
-    die folgenden Iterationen. Werden hingegen die äußersten Plateauverteilungen überdurchschnittlich oft ausgewählt, also
-    $c_{M,k}>\eta_2L$ mit $\eta_2\in(0,1)$, dann geht der Algorithmus davon aus, dass die Plateaus zu klein sind und verdoppelt
-    somit $\delta$ und $\delta_1$. Die Adaptionen finden nur mit einer immer kleiner werdenden Wahrscheinlichkeit von $\max(0.99^{n-1},1/\sqrt{n})$ statt. Diese Implementierung der Adaptionsvorgehensweise basiert auf \cite[Algorithm 2]{lau2019}.
+    In \cite{lau2019} it is proposed to adapt the widths $\delta$ and $\delta_0$ of the plateau distributions.
+    In my implementation every $L$ iterations it measures how high the number of selected suggestions $c_{j,k}$ from the plateau distributions $T_{j,k}$ are in this interval.
+    If the middle plateau distribution is called much more than the average, that is $c_{j,k}>L\eta_1$ with $\eta_1\in(0,1)$, then
+    the algorithm assumes that the plateaus are too wide and halves $\delta$ and $\delta_1$ accordingly for
+    the following iterations. If, on the other hand, the outermost plateau distributions are selected much more than the average, in especially
+    $c_{M,k}>\eta_2L$ with $\eta_2\in(0,1)$, then the algorithm assumes that the plateaus are too small and doubles
+    $\delta$ and $\delta_1$. The adaptations only take place with a constantly decreasing probability of $\max(0.99^{n-1},1/\sqrt{n})$. This implementation of the adaptation procedure is based on \cite[Algorithm 2]{lau2019}.
 
     \section{Experiments and Results}
 
     \subsection{Performance Measures}
     \subsubsection{Integrated Autocorrelation Times}
-    Die Autoren in dem Paper \cite{lau2019} verwenden zwei performance measures, um die Wirksamkeit des implementierten
-    Algorithmus zu untersuchen. Dies ist zum einen die integrated autocorrelation times (ACT), welche in $R$ MCMC
-    Simulationen mit jeweils $N$ Schritten für $K$ Komponenten berechnet wird. Sei im Folgenden
-    $X_t^{(r)}=(X_{t,1}^{(r)},\dots,X_{t,K}^{(r)})$ das Ergebnis der $r$-ten MCMC Simulation bei Schritt $t$, wobei
-    $r\in\{1,\dots,R\}$ und $t\in\{1,\dots,N\}$. Dafür schätzt man zunächst die normalisierte Autokorrelation $\hat{p}_{\tau,k}^{(r)}$
-    mithilfe von
+    The authors in the paper \cite{lau2019} use two performance measures to assess the effectiveness of the implemented
+    algorithm. One of these is the integrated autocorrelation times (ACT), which is measured in $R$ MCMC
+    simulations with $N$ steps for $K$ components. Let in the following be
+    $X_t^{(r)}=(X_{t,1}^{(r)},\dots,X_{t,K}^{(r)})$ the result of the $r$-th MCMC simulation at step $t$, where
+    $r\in\{1,\dots,R\}$ and $t\in\{1,\dots,N\}$. First of all, one estimates the normalized autocorrelation $\hat{p}_{\tau,k}^{(r)}$
+    by means of
     \begin{align*}
-        \hat{c}_{\tau,k}^{(r)}&=\frac{1}{N-\tau}\sum\limits_{i=1}^{N-\tau}(X_{i,k}^{(r)}-\bar{X_k}^{(r)})(X_{i+\tau,k}^{(r)}-\bar{X_k}^{(r)})\text{ und}\\
+        \hat{c}_{\tau,k}^{(r)}&=\frac{1}{N-\tau}\sum\limits_{i=1}^{N-\tau}(X_{i,k}^{(r)}-\bar{X_k}^{(r)})(X_{i+\tau,k}^{(r)}-\bar{X_k}^{(r)})\text{ and}\\\
         \hat{p}_{\tau,k}^{(r)}&=\frac{\hat{c}_{\tau,k}^{(r)}}{\hat{c}_{0,k}^{(r)}}
     \end{align*}
-    wobei $\bar{X_k}^{(r)}=1/N\sum\nolimits_{i=1}^NX_{i,k}^{(r)}$ das arithmetische Mittel $k$-ten Komponente in der $r$-ten
-    Simulation bezeichnet. Danach schätzt man die integrated autocorrelation times als
+    where $\bar{X_k}^{(r)}=1/N\sum\nolimits_{i=1}^NX_{i,k}^{(r)}$ is the arithmetic mean of the $k$-th component in the $r$-th
+    simulation. Afterwards one approximates the integrated autocorrelation times as
     \begin{align*}
         \hat{\tau}_{k}^{(r)}&=1+2\sum\limits_{\tau=1}^M\hat{p}_{\tau,k}^{(r)}
     \end{align*}
-    \cite{autocorrelation_blog} wobei die Größe $M\ll N$. Um $M$ zu bestimmen verwendet die Implementierung benutzt einen \textit{initial monotone sequence estimator}
-    wie ihn \cite{geyer1992} einführt. Dabei ist $M$ die größte natürliche Zahl ist, sodass $\hat{p}_{\tau,k}^{(r)} > 0$ für alle $\tau\in\{1,\dots,2M+1\}$ gilt und
-    und die Teilfolge $(\hat{p}_{2\tau,k}^{(r)} + \hat{p}_{2\tau+1,k}^{(r)})_{\tau=1,\dots,M}$ monoton ist \cite{geyer1992}.
+    \cite{autocorrelation_blog} where $M\ll N$. To determine $M$ the implementation uses a \textit{initial monotone sequence estimator}
+    as introduced by \cite [geyer1992]. where $M$ is the largest natural number, so that $\hat{p}_{\tau,k}^{(r)} > 0$ applies to all $\tau\in\{1,\dots,2M+1\}$ and
+    and the subsequence $(\hat{p}_{2\tau,k}^{(r)} + \hat{p}_{2\tau+1,k}^{(r)})_{\tau=1,\dots,M}$ is monotone \cite{geyer1992}.
 
     \subsubsection{Average Squared Jump Distance}
-    Ein weiteres Performance Maß ist die average squared jump distance (ASJD)
+    Another performance measure is the average squared jump distance (ASJD)
     \begin{align*}
         \text{ASDJ}_k^{(r)}=\frac{1}{N}\sum\limits_{i=1}^N|X_{i,k}^{(r)}-X_{i-1,k}^{(r)}|^2
     \end{align*}
-    für die $k$-te Komponente und die $r$-te Wiederholung der Markov chain \cite{lau2019}.
-    Hierbei sind größere ASJD Werte zu bevorzugen, da sie anzeigen, dass der state-space besser erkundet wird \cite{lau2019}.
+    for the $k$-th component and the $r$-th repetition of the Markov chain \cite{lau2019}.
+    Larger ASJD values are preferred, as they indicate that the state-space is better explored \cite{lau2019}.
 
     \subsection{Experiments}
     \subsubsection{Target Distributions}
-    Als Experimente um die Performance der adaptiven plateau-basierten MCMC Methode zu testen, wird in \cite{lau2019} versucht vier Zelverteilungen
-    mit der Markov chain zu approximieren. Die Zielverteilungen sind dabei
+    As experiments to test the performance of the adaptive plateau-based MCMC method \cite{lau2019} examines four target distributions
+    with the Markov chain. The target distributions are
     \begin{itemize}
-        \item $\pi_1:$ a mixture of 4-dimensional Gaussians $\frac12\mathcal{N}(\mu_1,\Sigma_1)+\frac12\mathcal{N}(\mu_2,\Sigma_2)$ with $\mu_1=(5,5,0,0)^T,\mu_2=(15,15,0,0)^T,\Sigma_1=\text{diag}(6.25,6.25,6.25,0.01),\Sigma_2=\text{diag}(6.25,6.25,0.25,0.01)$,
-        \item $\pi_2:$ an 8-dimensional banana distribution with density $f\circ\phi$, wobei $f$ die Dichte einer 8-dimensionalen Normalverteilung $\mathcal{N}(0,\Sigma_3)$ mit $\Sigma_3=\text{diag}(100,1,\dots,1)$ und $\phi(x)=(x_1,x_2+0.03x_1^2-3,x_3,\dots,x_8)$ für $x\in\mathbb{R}^8$ ist,
-        \item $\pi_3:$ a perturbed 2-dimensional Gaussian mit unnormalisierter Wahrscheinlichkeitsdichte $\tilde{\pi_3}(x)=\exp\left( -x^TAx-\cos\left( \frac{x_1}{0.1} \right) -0.5\cos\left( \frac{x_2}{0.1} \right) \right)$ für $x\in\mathbb{R}^2$ mit
+        \item $\pi_1:$ a mixture of 4-dimensional Gaussians $\frac12\mathcal{N}(\mu_1,\Sigma_1)+\frac12\mathcal{N}(\mu_2,\Sigma_2)$ with $\mu_1=(5,5,0,0)^T,\mu_2=(15,15,0,0)^T,\Sigma_1=\text{diag}(6. 25,6.25,6.25,0.01),\Sigma_2=\text{diag}(6.25,6.25,0.25,0.01)$,
+        \item $\pi_2:$ an 8-dimensional banana distribution with density $f\circ\phi$, where $f$ is the density of an 8-dimensional normal distribution $\mathcal{N}(0,\Sigma_3)$ with $\Sigma_3=\text{diag}(100,1,\dots,1)$ and $\phi(x)=(x_1,x_2+0. 03x_1^2-3,x_3,\dots,x_8)$ for $x\in\mathbb{R}^8$,
+        \item $\pi_3:$ a perturbed 2-dimensional gaussian with unnormalized probability density $\tilde{\pi_3}(x)=\exp\left( -x^TAx-\cos\left( \frac{x_1}{0.1} \right) -0.5\cos\left( \frac{x_2}{0.1} \right) \right)$ for $x\in\mathbb{R}^2$ with
         $A=\begin{pmatrix}
                     1 & 1\\
                     1 & 3/2
-        \end{pmatrix}$, und
-        \item $\pi_4:$ eine 1-dimensional bi-stable Verteilung mit unnormalisierter Verteilung $\tilde{\pi_4}(x)=\exp\left( -x^4+5x^2-\cos\left( \frac{x}{0.02} \right) \right)$ für $x\in\mathbb{R}$.
+        \end{pmatrix}$, and
+        \item $\pi_4:$ a 1-dimensional bi-stable distribution with unnormalized distribution $\tilde{\pi_4}(x)=\exp\left( -x^4+5x^2-\cos\left( \frac{x}{0.02} \right) \right)$ for $x\in\mathbb{R}$.
     \end{itemize}
-    Diese Verteilungen sind in Figure \ref{target_distributions} dargestellt, welche sich an \cite[Figure 3]{lau2019} orientiert. Die Darstellung
-    von $\pi_2$ in Figure \ref{target_distributions_pi_2} resultiert aus einer dimensionsreduzierte Vereinfachung, da ein Marginal mit 6 Integrationsvariablen zu
-    rechenintensiv gewesen ist. Dies erkennt man auch daran, dass die Wahrscheinlichkeitsdichte hier größer ist als diejenige in \cite{lau2019}.
+    These distributions are shown in Figure \ref{target_distributions}, which is based on \cite[Figure 3]{lau2019}. The representation
+    of $\pi_2$ in Figure \ref{target_distributions_pi_2} results from a dimensionally reduced simplification, since a marginal with 6 integration variables was computationally too expensive. One can also recognize this by the fact that the probability density here is greater than that in \cite{lau2019}.
     \begin{figure}
         \centering
         \begin{subfigure}{.45\textwidth}
@@ -234,25 +232,24 @@
     \end{figure}
 
     \subsubsection{Simulation Parameter Settings}
-    Für die 4 Zielverteilungen werden je $R=200$ MCMC Simulaitionen durchgeführt mit $N=4000$ Iterationen für $\pi_1$, $N=10000$ Iterationen für $\pi_2$, und $N=3000$ Iterationen für $\pi_3$ und $\pi_4$.
-    Die restlichen Parameter sind einheitlich für alle Simulationen. Dies sind
+    For each of the 4 target distributions $R=200$ MCMC simulations are performed with $N=4000$ iterations for $\pi_1$, $N=10000$ iterations for $\pi_2$, and $N=3000$ iterations for $\pi_3$ and $\pi_4$.
+    The remaining parameters are the same for all simulations. These are
     \begin{itemize}
-        \item $M=5$ verschiedene Plateauvorschlagsverteilungen,
-        \item $\delta=\delta_1=2$ Breite der Plateaus,
-        \item $\sigma=0.05$ und $\sigma_0=\sigma_1=3$ Flachheit der Plateau tails,
-        \item $\eta_1=\eta_2=0.4$ mindest Anteil für eine Adaption,
-        \item $L=40$ Länge des Intervalls zwischen den Adaptionen, und
-        \item einen burn-in Anteil von $0.5$ aller Iterationen.
+        \item $M=5$ different plateau proposal distributions,
+        \item $\delta=\delta_1=2$ widths of plateaus,
+        \item $\sigma=0.05$ and $\sigma_0=\sigma_1=3$ flatness of the plateau tails,
+        \item $\eta_1=\eta_2=0.4$ minimum amount for an adaptation to occur,
+        \item $L=40$ length of the interval between adaptations, and
+        \item a burn-in portion of $0.5$ of all iterations.
     \end{itemize}
-    Diese Paramter sind bis auf $L$, für welchen es keine exakten Angaben gibt, genau wie in \cite{lau2019} gesetzt.
+    These parameters are set exactly as in \cite{lau2019} except $L$, for which there is no exact specification.
 
     \subsection{Results}
-    Die zu den Experimenten zugehörigen Violinen plots findet man für die Zielverteilungen $\pi_1$, $\pi_2$, $\pi_3$ und $\pi_4$ finden sich
-    in den Figures \ref{violin_plots_pi_1}, \ref{violin_plots_pi_2}, \ref{violin_plots_pi_3} und \ref{violin_plots_pi_4}. Dort findet man
-    die komponenteweise Darstellung der ACT Verteilung in den Subfigures \ref{violin_plots_pi_1_act}, \ref{violin_plots_pi_2_act}, \ref{violin_plots_pi_3_act} und \ref{violin_plots_pi_1_act}, sowie
-    die komponentenweise Darstellung der ASJD Verteilung in den Subfigures \ref{violin_plots_pi_1_asjd}, \ref{violin_plots_pi_2_asjd}, \ref{violin_plots_pi_3_asjd} und \ref{violin_plots_pi_4_asjd}.
-    Um die Resultate besser einschätzen zu können sind in den Tabellen \ref{stat_results_act}, \ref{stat_results_log_act} und \ref{stat_results_asjd} komponentenweise der Median, mean, sowie Minimum und Maximum in gerundeter Form
-    aufgeführt für ACT, log-ACT und ASJD der Experimente.
+    The violin plots belonging to the experiments can be found for the target distributions $\pi_1$, $\pi_2$, $\pi_3$ and $\pi_4$
+    in the figures \ref{violin_plots_pi_1}, \ref{violin_plots_pi_2}, \ref{violin_plots_pi_3} and \ref{violin_plots_pi_4}. One finds the component-wise representation of the ACT distribution in the subfigures \ref{violin_plots_pi_1_act}, \ref{violin_plots_pi_2_act}, \ref{violin_plots_pi_3_act} and \ref{violin_plots_pi_1_act}, and
+    the component-wise representation of the ASJD distribution in the subfigures \ref{violin_plots_pi_1_asjd}, \ref{violin_plots_pi_2_asjd}, \ref{violin_plots_pi_3_asjd} and \ref{violin_plots_pi_4_asjd}.
+    In order to better estimate the results, the tables \ref{stat_results_act}, \ref{stat_results_log_act} and \ref{stat_results_asjd} contain the median, mean, minimum and maximum in rounded form
+    listed for ACT, log-ACT and ASJD results of the experiments.
 
     \begin{figure}[H]
         \begin{table}[H]
@@ -269,7 +266,7 @@
                 min & 6.569, 6.84 & 3.337 \\\hline
                 max & 9.722, 10.042 & 4.36 \\\hline
             \end{tabular}
-            \caption{Gerundete statistical results of ACT komponentenweise}
+            \caption{Rounded statistical results of ACT component-wise}
             \label{stat_results_act}
         \end{table}
     \end{figure}
@@ -289,7 +286,7 @@
                 min & 1.882, 1.923 & 1.205 \\\hline
                 max & 2.274, 2.307 & 1.473 \\\hline
             \end{tabular}
-            \caption{Gerundete statistical results of log-ACT komponentenweise}
+            \caption{Rounded statistical results of log-ACT component-wise}
             \label{stat_results_log_act}
         \end{table}
     \end{figure}
@@ -309,23 +306,23 @@
                 min & 1.512, 0.856 & 2.641 \\\hline
                 max & 1.779, 1.166 & 3.736 \\\hline
             \end{tabular}
-            \caption{Gerundete statistical results of ASJD komponentenweise}
+            \caption{Rounded statistical results of ASJD component-wise}
             \label{stat_results_asjd}
         \end{table}
     \end{figure}
 
     \begin{figure}
         \centering
-        \begin{subfigure}{0.45\textheight}
+        \begin{subfigure}{0.42\textheight}
               \centering
               \includegraphics[width=.8\linewidth]{../figs/ACT_pi_1.png}
-              \caption{komponenteweise ACT distribution für Zielverteilung $\pi_1$}
+              \caption{Component-wise ACT distributions for target distribution $\pi_1$}
               \label{violin_plots_pi_1_act}
         \end{subfigure}
-        \begin{subfigure}{0.45\textheight}
+        \begin{subfigure}{0.42\textheight}
               \centering
               \includegraphics[width=.8\linewidth]{../figs/ASJD_pi_1.png}
-              \caption{komponenteweise ASJD distribution für Zielverteilung $\pi_1$}
+              \caption{Component-wise ASJD distributions for target distribution $\pi_1$}
               \label{violin_plots_pi_1_asjd}
         \end{subfigure}
         \caption{Violin plots of performance measures for target distribution $\pi_1$}
@@ -334,16 +331,16 @@
 
     \begin{figure}
         \centering
-        \begin{subfigure}{0.45\textheight}
+        \begin{subfigure}{0.42\textheight}
               \centering
               \includegraphics[width=.8\linewidth]{../figs/ACT_pi_2.png}
-              \caption{komponenteweise ACT distribution für Zielverteilung $\pi_2$}
+              \caption{Component-wise ACT distributions for target distribution $\pi_2$}
               \label{violin_plots_pi_2_act}
         \end{subfigure}
-        \begin{subfigure}{0.45\textheight}
+        \begin{subfigure}{0.42\textheight}
               \centering
               \includegraphics[width=.8\linewidth]{../figs/ASJD_pi_2.png}
-              \caption{komponenteweise ASJD distribution für Zielverteilung $\pi_2$}
+              \caption{Component-wise ASJD distributions for target distribution $\pi_2$}
               \label{violin_plots_pi_2_asjd}
         \end{subfigure}
         \caption{Violin plots of performance measures for target distribution $\pi_2$}
@@ -352,16 +349,16 @@
 
     \begin{figure}
         \centering
-        \begin{subfigure}{0.45\textheight}
+        \begin{subfigure}{0.42\textheight}
               \centering
               \includegraphics[width=.8\linewidth]{../figs/log_ACT_pi_3.png}
-              \caption{komponenteweise log-ACT distribution für Zielverteilung $\pi_3$}
+              \caption{Component-wise ACT distributions for target distribution $\pi_3$}
               \label{violin_plots_pi_3_act}
         \end{subfigure}
-        \begin{subfigure}{0.45\textheight}
+        \begin{subfigure}{0.42\textheight}
               \centering
               \includegraphics[width=.8\linewidth]{../figs/ASJD_pi_3.png}
-              \caption{komponenteweise ASJD distribution für Zielverteilung $\pi_3$}
+              \caption{Component-wise ASJD distributions for target distribution $\pi_3$}
               \label{violin_plots_pi_3_asjd}
         \end{subfigure}
         \caption{Violin plots of performance measures for target distribution $\pi_3$}
@@ -370,16 +367,16 @@
 
     \begin{figure}
         \centering
-        \begin{subfigure}{0.45\textheight}
+        \begin{subfigure}{0.42\textheight}
               \centering
               \includegraphics[width=.8\linewidth]{../figs/ACT_pi_4.png}
-              \caption{komponenteweise ACT distribution für Zielverteilung $\pi_4$}
+              \caption{ACT distribution for target distribution $\pi_4$}
               \label{violin_plots_pi_4_act}
         \end{subfigure}
-        \begin{subfigure}{0.45\textheight}
+        \begin{subfigure}{0.42\textheight}
               \centering
               \includegraphics[width=.8\linewidth]{../figs/ASJD_pi_4.png}
-              \caption{komponenteweise ASJD distribution für Zielverteilung $\pi_4$}
+              \caption{ASJD distribution for target distribution $\pi_4$}
               \label{violin_plots_pi_4_asjd}
         \end{subfigure}
         \caption{Violin plots of performance measures for target distribution $\pi_4$}
@@ -387,28 +384,28 @@
     \end{figure}
 
     \section{Discussion}
-    Die Ergebnisse unterscheiden sich in den Werten zum Teil deutlich von denen der Simulationen in \cite{lau2019}.
-    Allerdings scheinen die Verhältnisse der Größenordnung zwischen den Komponenten der ACT und ASJD Werten zum größtenteil übereinzustimmen.
-    Es gibt bei den ACT Verteilungen dabei große Ähnlichkeit zwischen \cite{lau2019} und dieser Reimplementierung (Tables \ref{stat_results_act, stat_results_log_act}) bei den Zielveteilungen
-    $\pi_2$ und $\pi_4$, aber große Abweichungen bei $\pi_1$ und $\pi_3$. Auch bei den ASJD Verteilungen ergibt sich bei den Zielverteilungen $\pi_2$ und $\pi_4$ eine große Ähnlichkeit
-    zwischen \cite{lau2019} und diesem Projekt (Table \ref{stat_results_asjd}). Bei den Zielverteilungen $\pi_1$ und $\pi_3$ können wir bei den ASJD Verteilungen
-    in den Werten Unterschiede beobachten, aber die Größenverhältnisse zwischen den Komponenten sind sich sehr ähnlich.
-    Zudem hatte ich bei dem Durchführen der Exerimente den subjektiven Eindruck, dass bei es zu großen Unterschieden der ACT und ASJD Werten zwischen den Simulationen kam bei der Zielverteilung $\pi_4$.
-    Leider konnte ich aus zeitlichen Gründen nicht die MCMC Algorithmen MH, AG1 und AG2 zum Vergleichen \cite{lau2019} mit untersuchen. Deswegen kann
-    ich die größere Effektivität des adaptiven plateaubasierten multiple-try MCMC Algorithmus, zu dessen Schluss die Autoren in \cite{lau2019} kommen,
-    weder bestätigen noch widerlegen.
+    The results partly differ significantly from those of the simulations in \cite{lau2019}.
+    However, the ratios of the order of magnitude between the components of the ACT and ASJD values appear to be largely consistent.
+    In the ACT distributions, there is a close similarity between \cite{lau2019} and this reimplementation (tables \ref{stat_results_act, stat_results_log_act}) in the target distributions
+    $\pi_2$ and $\pi_4$, but large deviations for $\pi_1$ and $\pi_3$. There is also a high similarity in the ASJD distributions for the target distributions $\pi_2$ and $\pi_4$
+    between \cite{lau2019} and this project (Table \ref{stat_results_asjd}). For the target distributions $\pi_1$ and $\pi_3$ we can observe
+    differences in the values, but the ratios between the components are very similar to the ones in \cite{lau2019}.
+    Additionally I had the subjective impression that there were big variances in the ACT and ASJD distributions in experiments for the target distribution $\pi_4$.
+    Unfortunately I could not compare to the MCMC algorithms MH, AG1 and AG2 \cite{lau2019} due to time constraints. Therefore
+    the higher effectiveness of the adaptive plateau-based multiple-try MCMC algorithm, which the authors have concluded in \cite{lau2019},
+    can I neither confirm nor dispute.
 
 
     \section{Technical Details of Implementation}
-    Die Reimplementierung von \cite{lau2019} ist in Python 3 geschrieben und es werden die Pakete \texttt{Numpy}, \texttt{Scipy}
-    und \texttt{Matplotlib} benötigt. Die vier Simulationen zur Reproduktion der MCMC Resultate können mit des Skriptes
-    \texttt{run\_simulations.py} ausgeführt werden, welches alle vier Simulationen parallelisiert mithilfe von \texttt{multiprocessing} ausführt.
-    Die einstellbaren Parameter können unter \texttt{adjustable parameters} in den Skripten gefunden werden. Dabei folgen sie der Namenskonvention aus diesem Report
-    und dem Paper \cite{lau2019}. Nachdem die Simulationen ausgeführt wurden, kann mit dem Skript \texttt{create\_violin\_plots.py}
-    die Violinenplots für die Resultate erstellt werden. Zusätzlich gibt es noch die beiden Skripte \texttt{create\_fig\_2b.py}
-    und \texttt{create\_fig\_3.py} mit denen Reproduktionen der Figures 2b und 3 aus \cite{lau2019} erstellt werden können.
-    Falls man die in der Cloud schon bereitgestellten MCMC Läufe verwenden möchte, so muss man die entpackten \texttt{Numpy}-arrays in den Ordner
-    \texttt{simulations} kopieren.
+    The reimplementation of \cite{lau2019} is written in Python 3 and uses the packages \texttt{Numpy}, \texttt{Scipy}
+    and \texttt{Matplotlib}. The four simulations for reproducing the MCMC results can be started with the script
+    \texttt{run\_simulations.py}, which runs all four simulations in parallel using \texttt{multiprocessing}.
+    The adjustable parameters can be found under \texttt{adjustable parameters} in the script. They follow the naming convention from this report
+    and the paper \cite{lau2019}. After the simulations have been run, the script \texttt{create\_violin\_plots.py} can be used to create the
+    the violin plots for the results. Furthermore there are two scripts \texttt{create\_fig\_2b.py}
+    and \texttt{create\_fig\_3.py} with which reproductions of the Figures 2b and 3 from \cite{lau2019} can be produced.
+    If you want to use the MCMC runs already provided in the cloud, one has to copy the extracted \texttt{Numpy}-arrays into the folder
+    \texttt{simulations}.
 
     \bibliographystyle{apalike}
     \bibliography{ref}
