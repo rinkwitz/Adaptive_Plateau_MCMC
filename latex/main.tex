@@ -33,11 +33,10 @@
 
     \maketitle
 
-
     \section{Introduction}
-    ...
-
-    In diesem Projekt reimplementiere ich den vorgeschlagenen Markov Chain Monte Carlo (MCMC) Algorithmus aus dem Paper
+    The Markov Chain Monte Carlo (MCMC) sampling tries to investigate properties of distributions by drawing
+    random samples. This is a sequential process, where the drawing of a random sample at any given
+    time depends only on its immediate predecessor. In diesem Projekt reimplementiere ich eine Variante des MCMC Algorithmus aus dem Paper
     \cite{lau2019} und versuche die Ergebnisse der Experimente zu reproduzieren. Der hier betrachtete Paper baut auf den Ideen von
     \cite{metropolis1953,geyer1992,liu2000} und \cite{yang2019} auf.
     Der source code unter MIT Lizenz zu diesem Projekt findet sich in dem GitHub repository
@@ -46,7 +45,7 @@
     \end{align*}
     Da die Simulation der Markov chains sehr zeitaufwendig ist, kann man schon berechnete Läufe unter dem Link
     \begin{align*}
-        \texttt{drive.google.com/file/d/1MHFLckoims5PYrMWPh2xkQWR0kefofgy/view?usp=sharing}
+        \texttt{drive.google.com/file/d/1OzUR6-axu2M8hrUERXLregBqmXdpoS-Y/view?usp=sharing}
     \end{align*}
     herunterladen.
 
@@ -164,26 +163,21 @@
     Algorithmus zu untersuchen. Dies ist zum einen die integrated autocorrelation times (ACT), welche in $R$ MCMC
     Simulationen mit jeweils $N$ Schritten für $K$ Komponenten berechnet wird. Sei im Folgenden
     $X_t^{(r)}=(X_{t,1}^{(r)},\dots,X_{t,K}^{(r)})$ das Ergebnis der $r$-ten MCMC Simulation bei Schritt $t$, wobei
-    $r\in\{1,\dots,R\}$ und $t\in\{1,\dots,N\}$. Die Implementierung benutzt einen \textit{initial positive sequence estimator}
-    wie ihn \cite{geyer1992} verwendet. Dafür wird zunächst die komponentenweise die empirische Autokovarianz bestimmt um
-    die lagged autocovariance $\gamma_{i,k}^{(r)}$ mit $k\in\{1,\dots,K\}$ zu schätzen. Dabei ist
+    $r\in\{1,\dots,R\}$ und $t\in\{1,\dots,N\}$. Dafür schätzt man zunächst die normalisierte Autokorrelation $\hat{p}_{\tau,k}^{(r)}$
+    mithilfe von
     \begin{align*}
-        \hat{\gamma}_{t,k}^{(r)}&=\frac{1}{N}\sum\limits_{i=1}^{N-t}(X_{i,k}^{(r)}-\bar{X_k}^{(r)})(X_{i+t,k}^{(r)}-\bar{X_k}^{(r)})
+        \hat{c}_{\tau,k}^{(r)}&=\frac{1}{N-\tau}\sum\limits_{i=1}^{N-\tau}(X_{i,k}^{(r)}-\bar{X_k}^{(r)})(X_{i+\tau,k}^{(r)}-\bar{X_k}^{(r)})\text{ und}\\
+        \hat{p}_{\tau,k}^{(r)}&=\frac{\hat{c}_{\tau,k}^{(r)}}{\hat{c}_{0,k}^{(r)}}
     \end{align*}
     wobei $\bar{X_k}^{(r)}=1/N\sum\nolimits_{i=1}^NX_{i,k}^{(r)}$ das arithmetische Mittel $k$-ten Komponente in der $r$-ten
-    Simulation bezeichnet. Danach schauen wir uns die Summen
+    Simulation bezeichnet. Danach schätzt man die integrated autocorrelation times als
     \begin{align*}
-        \hat{\Gamma}_{m,k}^{(r)} &= \hat{\gamma}_{2m,k}^{(r)} + \hat{\gamma}_{2m+1,k}^{(r)}
+        \hat{\tau}_{k}^{(r)}&=1+2\sum\limits_{\tau=1}^M\hat{p}_{\tau,k}^{(r)}
     \end{align*}
-    von benachbarten Autokovarianzen Paaren an. Schließlich ergibt sich die integrated autocorrelation times als
-    \begin{align*}
-        \text{ACT}_k^{(r)}&=-\hat{\gamma}_{0,k}^{(r)}+2\sum\limits_{i=0}^{m}\hat{\Gamma}_{m,k}^{(r)}
-    \end{align*}
-    wobei $m$ die größte natürliche Zahl ist, sodass $\hat{\Gamma}_{i,k}^{(r)} > 0$ für alle $i\in\{1,\dots,m\}$ gilt
-    \cite{geyer1992}. Schränkt man dies noch weiter ein und fordert zusätzlich noch, dass
-    die Teilfolge $(\hat{\Gamma}_{i,k}^{(r)})_{i=1,\dots,m}$ monoton sein muss, so erhält man einen
-    \textit{initial monotone sequence estimator} \cite{geyer1992}. Dabei zeigt eine kleinere autocorrelation times an, dass
-    aufeinanderfolgende samples eine kleinere Korrelation haben \cite{lau2019}.
+    \cite{autocorrelation_blog} wobei die Größe $M\ll N$. Um $M$ zu bestimmen verwendet die Implementierung benutzt einen \textit{initial monotone sequence estimator}
+    wie ihn \cite{geyer1992} einführt. Dabei ist $M$ die größte natürliche Zahl ist, sodass $\hat{p}_{\tau,k}^{(r)} > 0$ für alle $\tau\in\{1,\dots,2M+1\}$ gilt und
+    und die Teilfolge $(\hat{p}_{2\tau,k}^{(r)} + \hat{p}_{2\tau+1,k}^{(r)})_{\tau=1,\dots,M}$ monoton ist \cite{geyer1992}.
+
     \subsubsection{Average Squared Jump Distance}
     Ein weiteres Performance Maß ist die average squared jump distance (ASJD)
     \begin{align*}
@@ -258,14 +252,22 @@
     die komponenteweise Darstellung der ACT Verteilung in den Subfigures \ref{violin_plots_pi_1_act}, \ref{violin_plots_pi_2_act}, \ref{violin_plots_pi_3_act} und \ref{violin_plots_pi_1_act}, sowie
     die komponentenweise Darstellung der ASJD Verteilung in den Subfigures \ref{violin_plots_pi_1_asjd}, \ref{violin_plots_pi_2_asjd}, \ref{violin_plots_pi_3_asjd} und \ref{violin_plots_pi_4_asjd}.
     Um die Resultate besser einschätzen zu können sind in den Tabellen \ref{stat_results_act}, \ref{stat_results_log_act} und \ref{stat_results_asjd} komponentenweise der Median, mean, sowie Minimum und Maximum in gerundeter Form
-    aufgeführt für ACT, log ACT und ASJD der Experimente.
+    aufgeführt für ACT, log-ACT und ASJD der Experimente.
 
     \begin{figure}[H]
         \begin{table}[H]
             \centering
             \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
-                \hline & $\pi_1$ & $\pi_2$ & $\pi_3$ & $\pi_4$ \\ \hline
-                ...
+                \hline & $\pi_1$ & $\pi_2$ \\ \hline
+                median & 8.999, 9.149, 5.126, 12.131 & 82.767, 88.027, 3.179, 3.17, 3.173, 3.168, 3.17, 3.181 \\\hline
+                mean & 9.117, 9.171, 5.019, 14.828 & 92.596, 102.911, 3.168, 3.159, 3.164, 3.156, 3.165, 3.167 \\\hline
+                min & 7.594, 7.277, 3.247, 3.042 & 54.33, 46.736, 3.022, 3.007, 3.019, 3.034, 3.032, 3.03 \\\hline
+                max & 11.145, 11.295, 6.262, 102.043 & 231.547, 246.187, 3.354, 3.318, 3.325, 3.323, 3.347, 3.354 \\\hline
+                \hline & $\pi_3$ & $\pi_4$ \\ \hline
+                median & 7.769, 8.155 & 3.62 \\\hline
+                mean & 7.821, 8.288 & 3.635 \\\hline
+                min & 6.569, 6.84 & 3.337 \\\hline
+                max & 9.722, 10.042 & 4.36 \\\hline
             \end{tabular}
             \caption{Gerundete statistical results of ACT komponentenweise}
             \label{stat_results_act}
@@ -276,10 +278,18 @@
         \begin{table}[H]
             \centering
             \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
-                \hline & $\pi_1$ & $\pi_2$ & $\pi_3$ & $\pi_4$ \\ \hline
-                ...
+                \hline & $\pi_1$ & $\pi_2$ \\ \hline
+                median & 2.197, 2.214, 1.634, 2.496 & 4.416, 4.478, 1.157, 1.154, 1.155, 1.153, 1.154, 1.157 \\\hline
+                mean & 2.207, 2.213, 1.605, 2.382 & 4.488, 4.551, 1.153, 1.15, 1.152, 1.149, 1.152, 1.152 \\\hline
+                min & 2.027, 1.985, 1.178, 1.113 & 3.995, 3.845, 1.106, 1.101, 1.105, 1.11, 1.109, 1.108 \\\hline
+                max & 2.411, 2.424, 1.835, 4.625 & 5.445, 5.506, 1.21, 1.199, 1.202, 1.201, 1.208, 1.21 \\\hline
+                \hline & $\pi_3$ & $\pi_4$ \\ \hline
+                median & 2.05, 2.099 & 1.286 \\\hline
+                mean & 2.053, 2.111 & 1.289 \\\hline
+                min & 1.882, 1.923 & 1.205 \\\hline
+                max & 2.274, 2.307 & 1.473 \\\hline
             \end{tabular}
-            \caption{Gerundete statistical results of log ACT komponentenweise}
+            \caption{Gerundete statistical results of log-ACT komponentenweise}
             \label{stat_results_log_act}
         \end{table}
     \end{figure}
@@ -288,7 +298,16 @@
         \begin{table}[H]
             \centering
             \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
-                ...
+                \hline & $\pi_1$ & $\pi_2$ \\ \hline
+                median & 26.172, 26.186, 5.691, 0.032 & 9.508, 2.907, 2.948, 2.945, 2.942, 2.938, 2.953, 2.952 \\\hline
+                mean & 26.191, 26.169, 6.158, 0.041 & 9.791, 2.922, 2.972, 2.965, 2.949, 2.96, 3.033, 2.977 \\\hline
+                min & 24.792, 24.357, 5.095, 0.029 & 8.315, 2.837, 2.852, 2.858, 2.854, 2.841, 2.863, 2.86 \\\hline
+                max & 27.612, 28.239, 12.865, 0.478 & 21.963, 3.306, 3.698, 3.522, 3.161, 3.534, 3.651, 3.648 \\\hline
+                \hline & $\pi_3$ & $\pi_4$ \\ \hline
+                median & 1.641, 0.894 & 3.527 \\\hline
+                mean & 1.65, 0.905 & 3.514 \\\hline
+                min & 1.512, 0.856 & 2.641 \\\hline
+                max & 1.779, 1.166 & 3.736 \\\hline
             \end{tabular}
             \caption{Gerundete statistical results of ASJD komponentenweise}
             \label{stat_results_asjd}
@@ -336,7 +355,7 @@
         \begin{subfigure}{0.45\textheight}
               \centering
               \includegraphics[width=.8\linewidth]{../figs/log_ACT_pi_3.png}
-              \caption{komponenteweise log ACT distribution für Zielverteilung $\pi_3$}
+              \caption{komponenteweise log-ACT distribution für Zielverteilung $\pi_3$}
               \label{violin_plots_pi_3_act}
         \end{subfigure}
         \begin{subfigure}{0.45\textheight}
@@ -368,7 +387,17 @@
     \end{figure}
 
     \section{Discussion}
-    TO DO ...
+    Die Ergebnisse unterscheiden sich in den Werten zum Teil deutlich von denen der Simulationen in \cite{lau2019}.
+    Allerdings scheinen die Verhältnisse der Größenordnung zwischen den Komponenten der ACT und ASJD Werten zum größtenteil übereinzustimmen.
+    Es gibt bei den ACT Verteilungen dabei große Ähnlichkeit zwischen \cite{lau2019} und dieser Reimplementierung (Tables \ref{stat_results_act, stat_results_log_act}) bei den Zielveteilungen
+    $\pi_2$ und $\pi_4$, aber große Abweichungen bei $\pi_1$ und $\pi_3$. Auch bei den ASJD Verteilungen ergibt sich bei den Zielverteilungen $\pi_2$ und $\pi_4$ eine große Ähnlichkeit
+    zwischen \cite{lau2019} und diesem Projekt (Table \ref{stat_results_asjd}). Bei den Zielverteilungen $\pi_1$ und $\pi_3$ können wir bei den ASJD Verteilungen
+    in den Werten Unterschiede beobachten, aber die Größenverhältnisse zwischen den Komponenten sind sich sehr ähnlich.
+    Zudem hatte ich bei dem Durchführen der Exerimente den subjektiven Eindruck, dass bei es zu großen Unterschieden der ACT und ASJD Werten zwischen den Simulationen kam bei der Zielverteilung $\pi_4$.
+    Leider konnte ich aus zeitlichen Gründen nicht die MCMC Algorithmen MH, AG1 und AG2 zum Vergleichen \cite{lau2019} mit untersuchen. Deswegen kann
+    ich die größere Effektivität des adaptiven plateaubasierten multiple-try MCMC Algorithmus, zu dessen Schluss die Autoren in \cite{lau2019} kommen,
+    weder bestätigen noch widerlegen.
+
 
     \section{Technical Details of Implementation}
     Die Reimplementierung von \cite{lau2019} ist in Python 3 geschrieben und es werden die Pakete \texttt{Numpy}, \texttt{Scipy}
