@@ -23,8 +23,6 @@
 \DeclarePairedDelimiter\ceil{\lceil}{\rceil}
 \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 \DeclareMathOperator{\Tr}{Tr}
-%\DeclareMathOperator{\sup}{sup}
-%\DeclareMathOperator{\inf}{inf}
 \DeclareMathOperator*{\argmin}{\arg\!\min}
 \DeclareMathOperator*{\argmax}{\arg\!\max}
 
@@ -37,14 +35,20 @@
 
 
     \section{Introduction}
+    ...
+
     In diesem Projekt reimplementiere ich den vorgeschlagenen Markov Chain Monte Carlo (MCMC) Algorithmus aus dem Paper
-    \cite{lau2019} und versuche die Ergebnisse der Experimente zu reproduzieren. Der untersuchte Paper baut auf dem
-    \textit{Metropolis-Hastings} MCMC Algorithmus \cite{metropolis1953} auf. \cite{liu2000}
+    \cite{lau2019} und versuche die Ergebnisse der Experimente zu reproduzieren. Der hier betrachtete Paper baut auf den Ideen von
+    \cite{metropolis1953,geyer1992,liu2000} und \cite{yang2019} auf.
     Der source code unter MIT Lizenz zu diesem Projekt findet sich in dem GitHub repository
     \begin{align*}
         \texttt{github.com/rinkwitz/Adaptive\_Plateau\_MCMC}\,.
     \end{align*}
-
+    Da die Simulation der Markov chains sehr zeitaufwendig ist, kann man schon berechnete Läufe unter dem Link
+    \begin{align*}
+        \texttt{drive.google.com/file/d/1MHFLckoims5PYrMWPh2xkQWR0kefofgy/view?usp=sharing}
+    \end{align*}
+    herunterladen.
 
     \section{Adaptive Component-wise Multiple-Try Metropolis Algorithm} Der Kernalgorithmus
     des Papers \cite{lau2019} besteht aus einem MCMC Algorithmus der drei Eigenschaften erfüllt. Der Algorithmus schlägt
@@ -222,7 +226,7 @@
         \begin{subfigure}{.45\textwidth}
               \centering
               \includegraphics[width=.8\linewidth]{../figs/fig_3_pi_3.png}
-              \caption{Un-normalised PDF of $\pi_3$}
+              \caption{PDF of $\pi_3$}
               \label{target_distributions_pi_3}
         \end{subfigure}
         \begin{subfigure}{.45\textwidth}
@@ -284,16 +288,7 @@
         \begin{table}[H]
             \centering
             \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
-                \hline & $\pi_1$ & $\pi_2$ \\ \hline
-                median & 5.567, 5.564, 3.076, -4.002 & 9.372, 8.024, 0.612, 0.606, 0.596, 0.604, 0.611, 0.608 \\\hline
-                mean & 5.554, 5.56, 2.997, -3.934 & 9.49, 8.239, 0.636, 0.619, 0.601, 0.614, 0.611, 0.606 \\\hline
-                min & 5.06, 4.904, 2.03, -4.184 & 8.553, 6.519, 0.49, 0.492, 0.489, 0.501, 0.404, 0.456 \\\hline
-                max & 5.774, 5.807, 3.508, -0.742 & 10.83, 10.196, 0.831, 0.806, 0.743, 1.186, 0.752, 0.806 \\\hline
-                \hline & $\pi_1$ & $\pi_2$ \\ \hline
-                median & 2.606, 2.204 & 3.759 \\\hline
-                mean & 2.601, 2.194 & 3.664 \\\hline
-                min & 2.311, 1.9 & 1.223 \\\hline
-                max & 2.883, 2.516 & 4.398 \\\hline
+                ...
             \end{tabular}
             \caption{Gerundete statistical results of ASJD komponentenweise}
             \label{stat_results_asjd}
@@ -383,6 +378,8 @@
     und dem Paper \cite{lau2019}. Nachdem die Simulationen ausgeführt wurden, kann mit dem Skript \texttt{create\_violin\_plots.py}
     die Violinenplots für die Resultate erstellt werden. Zusätzlich gibt es noch die beiden Skripte \texttt{create\_fig\_2b.py}
     und \texttt{create\_fig\_3.py} mit denen Reproduktionen der Figures 2b und 3 aus \cite{lau2019} erstellt werden können.
+    Falls man die in der Cloud schon bereitgestellten MCMC Läufe verwenden möchte, so muss man die entpackten \texttt{Numpy}-arrays in den Ordner
+    \texttt{simulations} kopieren.
 
     \bibliographystyle{apalike}
     \bibliography{ref}

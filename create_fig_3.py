@@ -7,6 +7,7 @@ from Utils import *
 from scipy.integrate import dblquad
 from scipy import integrate
 
+show_plots = False
 
 # (a)
 path = pathlib.Path('figs')/'fig_3_pi_1.png'
@@ -46,7 +47,8 @@ fig.colorbar(im, ax=ax)
 plt.gca().invert_yaxis()
 plt.tight_layout()
 plt.savefig(path)
-#plt.show()
+if show_plots:
+    plt.show()
 plt.close()
 
 
@@ -87,7 +89,8 @@ fig.colorbar(im, ax=ax)
 plt.gca().invert_yaxis()
 plt.tight_layout()
 plt.savefig(path)
-#plt.show()
+if show_plots:
+    plt.show()
 plt.close()
 
 
@@ -100,12 +103,13 @@ x = np.linspace(-3, 3, res)
 y = np.linspace(-3, 3, res)
 X, Y = np.meshgrid(x, y)
 
+from NormalizingConstant_pi_3 import pi_3_normalizing_const
 Z = np.empty((res, res))
 A = np.array([[1, 1], [1, 1.5]])
 for i in range(res):
     for j in range(res):
         v = np.array([[X[i, j]], [Y[i, j]]])
-        Z[i, j] = (np.exp(-np.dot(np.dot(v.T, A), v) - np.cos(v[0, 0] / .1) - .5 * np.cos(v[1, 0] / .1)))[0, 0]
+        Z[i, j] = pi_3_normalizing_const * (np.exp(-np.dot(np.dot(v.T, A), v) - np.cos(v[0, 0] / .1) - .5 * np.cos(v[1, 0] / .1)))[0, 0]
 ticks = [(res // 6) * i for i in range(7)]
 labels = [int(round(x[t], 0)) for t in ticks]
 ax.set_xticks(ticks)
@@ -119,7 +123,8 @@ fig.colorbar(im, ax=ax)
 plt.gca().invert_yaxis()
 plt.tight_layout()
 plt.savefig(path)
-#plt.show()
+if show_plots:
+    plt.show()
 plt.close()
 
 
@@ -135,5 +140,6 @@ ax.plot(xs, ys, 'k')
 
 plt.tight_layout()
 plt.savefig(path)
-#plt.show()
+if show_plots:
+    plt.show()
 plt.close()

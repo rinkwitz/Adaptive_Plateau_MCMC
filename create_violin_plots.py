@@ -3,7 +3,7 @@ from PerformanceMeasure import *
 from Utils import *
 
 show_plots = False
-show_latex_tables = True
+print_latex_tables = True
 np.set_printoptions(linewidth=160)
 
 median_header = 'median '
@@ -72,7 +72,7 @@ act_str += '\\hline & $\\pi_3$ & $\\pi_4$ \\\\ \\hline\n' + median_header + medi
 log_act_str += '\\hline & $\\pi_3$ & $\\pi_4$ \\\\ \\hline\n' + median_header + median_log_act + '\\\\\\hline \n' + mean_header + mean_log_act + '\\\\\\hline \n' + min_header + min_log_act + '\\\\\\hline \n' + max_header + max_log_act + '\\\\\\hline \n'
 asjd_str += '\\hline & $\\pi_3$ & $\\pi_4$ \\\\ \\hline\n' + median_header + median_asjd + '\\\\\\hline \n' + mean_header + mean_asjd + '\\\\\\hline \n' + min_header + min_asjd + '\\\\\\hline \n' + max_header + max_asjd + '\\\\\\hline \n'
 
-if show_latex_tables:
+if print_latex_tables:
     print('act:\n{}\n'.format(act_str))
     print('log_act:\n{}\n'.format(log_act_str))
     print('asjd:\n{}\n'.format(asjd_str))
